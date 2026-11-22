@@ -1,1 +1,735 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f6f5f1">
+<title>Il perchè e l'archivio delle barzellette</title>
+<style>
+  :root {
+    --bg: #f6f5f1; --paper: #fffefa; --ink: #20211f; --muted: #777971;
+    --line: #e4e3dc; --accent: #c8f169; --accent-ink: #25320d;
+    --purple: #ddd3ff; --radius: 22px; --shadow: 0 12px 40px #22220b0a;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  a { color: inherit; }
+  .wrap { width: min(1120px, calc(100% - 40px)); margin: auto; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:24px 0; border-bottom:1px solid var(--line); }
+  .brand { display:flex; align-items:center; gap:11px; font-weight:850; letter-spacing:-.05em; font-size:1.15rem; text-decoration:none; }
+  .logo { display:grid; place-items:center; width:34px; height:34px; border-radius:12px; background:var(--accent); font-size:19px; }
+  nav { display:flex; gap:8px; align-items:center; }
+  nav a, .pill-link { text-decoration:none; color:var(--muted); padding:9px 13px; border-radius:999px; font-size:.9rem; }
+  nav a:hover, .pill-link:hover { background:#eae9e2; color:var(--ink); }
+  .eyebrow { text-transform:uppercase; letter-spacing:.14em; font-size:.72rem; color:var(--muted); font-weight:750; }
+  .hero { padding:58px 0 32px; display:grid; grid-template-columns:1.1fr .9fr; gap:34px; align-items:end; }
+  h1 { font-size:clamp(2.8rem, 7vw, 5.8rem); line-height:.95; letter-spacing:-.085em; margin:16px 0 22px; max-width:760px; }
+  h1 span { color:#777971; }
+  .intro { color:var(--muted); max-width:490px; font-size:1.03rem; }
+  .hero-note { border:1px solid var(--line); background:var(--paper); padding:23px; border-radius:var(--radius); box-shadow:var(--shadow); transform:rotate(1deg); }
+  .hero-note .note-title { display:flex; justify-content:space-between; align-items:center; font-size:.78rem; color:var(--muted); }
+  .stamp { background:var(--purple); padding:5px 9px; border-radius:999px; color:#393052; font-size:.72rem; font-weight:800; }
+  .hero-note p { font-size:1.25rem; font-weight:700; line-height:1.35; letter-spacing:-.03em; margin:22px 0 12px; }
+  .daily { background:var(--accent); color:var(--accent-ink); border-radius:28px; padding:clamp(24px, 5vw, 52px); position:relative; overflow:hidden; }
+  .daily:after { content:"✳"; position:absolute; right:22px; top:4px; font-size:clamp(6rem, 15vw, 12rem); opacity:.13; line-height:1; transform:rotate(-12deg); pointer-events:none; }
+  .daily-top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .daily .eyebrow { color:#52652d; }
+  .date-chip { border:1px solid #829d4a; border-radius:999px; padding:6px 11px; font-size:.78rem; }
+  .daily h2 { max-width:800px; font-size:clamp(1.8rem, 4.5vw, 3.8rem); line-height:1.05; letter-spacing:-.065em; margin:28px 0 18px; position:relative; z-index:1; }
+  .daily p { max-width:730px; font-size:1.05rem; position:relative; z-index:1; }
+  .daily-bottom { display:flex; justify-content:space-between; align-items:center; gap:15px; margin-top:32px; position:relative; z-index:1; }
+  .source { font-size:.78rem; opacity:.75; }
+  .actions { display:flex; gap:9px; flex-wrap:wrap; }
+  .btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:10px 15px; font-weight:700; font-size:.88rem; transition:transform .15s, background .15s; }
+  .btn:hover { transform:translateY(-2px); }
+  .btn.dark { background:var(--ink); border-color:var(--ink); color:white; }
+  .btn.light { background:transparent; border-color:#829d4a; }
+  .section-head { display:flex; justify-content:space-between; align-items:end; gap:20px; margin:64px 0 22px; }
+  h2.section-title { font-size:clamp(1.8rem, 4vw, 2.8rem); line-height:1; letter-spacing:-.065em; margin:8px 0 0; }
+  .count { color:var(--muted); font-size:.85rem; white-space:nowrap; }
+  .joke-tools { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+  .search { flex:1 1 240px; min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:12px 17px; outline:none; }
+  .search:focus, select:focus { border-color:#8da54c; box-shadow:0 0 0 3px #c8f16955; }
+  select { background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:12px 15px; color:var(--ink); outline:none; }
+  .category-row { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 22px; }
+  .cat { border:1px solid var(--line); background:transparent; border-radius:999px; padding:8px 13px; color:var(--muted); font-size:.85rem; }
+  .cat.active, .cat:hover { background:var(--ink); color:white; border-color:var(--ink); }
+  .jokes { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:13px; }
+  .joke { display:flex; flex-direction:column; min-height:205px; background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:20px; transition:transform .18s, box-shadow .18s; cursor:pointer; text-align:left; }
+  .joke:hover, .joke:focus-visible { transform:translateY(-3px); box-shadow:var(--shadow); outline:none; border-color:#a7bd72; }
+  .joke-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .tag { background:#efeee8; border-radius:999px; padding:5px 9px; font-size:.7rem; color:#55564f; }
+  .joke-num { font-size:.75rem; color:#a0a197; }
+  .joke h3 { font-size:1.1rem; line-height:1.3; letter-spacing:-.025em; margin:17px 0 8px; }
+  .joke p { color:#66685f; font-size:.92rem; margin:0 0 10px; white-space:pre-line; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+  .joke-modal-backdrop { position:fixed; inset:0; z-index:30; display:none; place-items:center; padding:20px; background:#20211f99; backdrop-filter:blur(5px); }
+  .joke-modal-backdrop.open { display:grid; }
+  .joke-modal { width:min(720px, 100%); max-height:min(85vh, 900px); overflow:auto; background:var(--paper); border:1px solid var(--line); border-radius:24px; padding:clamp(22px, 4vw, 38px); box-shadow:0 30px 100px #0004; }
+  .joke-modal .joke-top { margin-bottom:24px; }
+  .joke-modal h2 { font-size:clamp(1.5rem, 4vw, 2.4rem); line-height:1.12; letter-spacing:-.05em; margin:0 0 18px; }
+  .joke-modal .full-joke-text { color:var(--ink); font-size:1.05rem; line-height:1.8; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .joke-modal-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:28px; flex-wrap:wrap; }
+  .joke-footer { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:auto; padding-top:12px; }
+  .tiny-btn { border:0; background:transparent; padding:5px 0; color:var(--muted); font-size:.8rem; }
+  .tiny-btn:hover { color:var(--ink); }
+  .empty { display:none; padding:35px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:18px; }
+  .load-row { display:flex; justify-content:center; margin:25px 0 0; }
+  .misc { display:grid; grid-template-columns:1fr 1fr 1fr; gap:13px; margin:20px 0 70px; }
+  .misc-card { background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:20px; }
+  .misc-card .symbol { font-size:1.5rem; margin-bottom:12px; }
+  .misc-card h3 { font-size:1rem; margin:0 0 7px; }
+  .misc-card p { margin:0; color:var(--muted); font-size:.88rem; }
+  footer { border-top:1px solid var(--line); padding:23px 0 34px; color:var(--muted); font-size:.8rem; display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; }
+  footer a { text-decoration:none; border-bottom:1px dotted #a7a89e; }
+  .toast { position:fixed; bottom:22px; left:50%; transform:translate(-50%, 20px); opacity:0; pointer-events:none; background:var(--ink); color:white; border-radius:999px; padding:11px 17px; font-size:.88rem; transition:.25s; z-index:10; box-shadow:var(--shadow); }
+  .toast.show { opacity:1; transform:translate(-50%,0); }
+  .secret { cursor:help; border-bottom:1px dotted currentColor; }
+  .modal-backdrop { position:fixed; inset:0; background:#20211f88; display:none; place-items:center; padding:20px; z-index:20; }
+  .modal-backdrop.open { display:grid; }
+  .modal { max-width:470px; width:100%; background:var(--paper); border-radius:24px; padding:28px; box-shadow:0 25px 80px #0003; }
+  .modal h2 { margin:0 0 12px; letter-spacing:-.05em; }
+  .modal p { color:var(--muted); }
+  .modal-actions { display:flex; justify-content:flex-end; margin-top:20px; }
+  @media(max-width:800px) { .hero { grid-template-columns:1fr; padding-top:40px; } .hero-note { max-width:540px; } .jokes { grid-template-columns:repeat(2,minmax(0,1fr)); } .misc { grid-template-columns:1fr; } }
+  @media(max-width:560px) { .wrap { width:min(100% - 28px, 1120px); } header { align-items:flex-start; } nav { gap:0; } nav a { padding:8px; font-size:.8rem; } nav a:first-child { display:none; } .hero { gap:22px; } .daily { border-radius:21px; } .daily-bottom { align-items:flex-start; flex-direction:column; } .jokes { grid-template-columns:1fr; } .joke { min-height:0; } .section-head { margin-top:48px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="#" aria-label="La Teoria del Boh, home"><span class="logo">?</span>Il Perchè</a>
+    <nav aria-label="Navigazione">
+      <a href="#oggi">Fun fact del giorno</a>
+      <a href="#barzellette">Barzellette</a>
+      <a href="#misc">Miscellanea ↗</a>
+    </nav>
+  </header>
 
+  <main>
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Archivio ufficialmente non necessario</div>
+        <h1>La conoscenza<br>è potere.<br><span>La situazione, è di orto.</span></h1>
+        <p class="intro">Curiosità che non ti servivano, barzellette che forse non fanno ridere e informazioni che nessuno ha chiesto.</p>
+      </div>
+      <aside class="hero-note">
+        <div class="note-title"><span>NOTA DI REDAZIONE</span><span class="stamp">Staff Pewex</span></div>
+        <p>“Il 100% dei supermercati italiani che non ha alte scaffalature non è di orto.”</p>
+        <div class="eyebrow">— ufficio alte scaffalature</div>
+      </aside>
+    </section>
+
+    <section id="oggi" class="daily" aria-labelledby="daily-title">
+      <div class="daily-top">
+        <div class="eyebrow">✳ Il fatto del giorno</div>
+        <span class="date-chip" id="today-date">Caricamento data…</span>
+      </div>
+      <h2 id="daily-title">Un momento, stiamo consultando l'oracolo.</h2>
+            <p id="daily-text"></p>
+      <p id="daily-text">La verità è là fuori.</p>
+      <div class="daily-bottom">
+        <span class="source" id="daily-source">Archivio della redazione · aggiornamento quotidiano</span>
+        <div class="actions">
+          <button class="btn dark" id="copy-fact">Copia curiosità ↗</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="barzellette">
+      <div class="section-head">
+        <div><div class="eyebrow">Il reparto scaffalature alte</div><h2 class="section-title">Barzellette & affini</h2></div>
+        <div class="count" id="joke-count">0 risultati</div>
+      </div>
+      <div class="joke-tools">
+        <input id="search" class="search" type="search" placeholder="Cerca una barzelletta, una parola…" aria-label="Cerca barzellette">
+        <select id="sort" aria-label="Ordina barzellette">
+          <option value="default">Ordine archivio</option>
+          <option value="az">Titolo A → Z</option>
+          <option value="random">Ordine casuale</option>
+        </select>
+      </div>
+      <div class="category-row" id="categories" aria-label="Categorie barzellette"></div>
+      <div class="jokes" id="jokes-list"></div>
+      <div class="empty" id="empty">Nessuna barzelletta trovata. Anche l'umorismo ha i suoi limiti.</div>
+      <div class="load-row"><button class="btn" id="load-more">Carica altre barzellette</button></div>
+    </section>
+
+    <section id="misc">
+      <div class="section-head">
+        <div><div class="eyebrow">Dettagli che non migliorano il servizio</div><h2 class="section-title">La miscellanea</h2></div>
+      </div>
+      <div class="misc">
+        <article class="misc-card">
+          <div class="symbol">⌖</div><h3>La nostra sede</h3>
+          <p>Via Kafka 404</p>
+        </article>
+        <article class="misc-card">
+          <div class="symbol">⌁</div><h3>Informazioni societarie</h3>
+          <p>Fondato il 3 Novembre 2025</p>
+        </article>
+        <article class="misc-card">
+          <div class="symbol">⏳</div><h3>Stato dei lavori</h3>
+          <p><span class="secret" id="status-secret" title="Prova a cliccare">Tutto sotto controllo.</span></p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© <span id="year"></span> Il Perchè · Nessun neurone è stato consultato legalmente.</span>
+    <span><a href="#" id="about-link">Note legali immaginarie</a> · <a href="#" id="surprise-link">Non premere</a></span>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="joke-modal-backdrop" id="joke-modal" role="dialog" aria-modal="true" aria-labelledby="joke-modal-title">
+  <article class="joke-modal">
+    <div class="joke-top"><span class="tag" id="joke-modal-category"></span><span class="joke-num" id="joke-modal-number"></span></div>
+    <h2 id="joke-modal-title"></h2>
+    <div class="full-joke-text" id="joke-modal-text"></div>
+    <div class="joke-modal-actions"><button class="btn" id="joke-modal-copy" type="button">Copia barzelletta</button><button class="btn dark" id="joke-modal-close" type="button">Chiudi</button></div>
+  </article>
+</div>
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="eyebrow">COMUNICAZIONE IMPORTANTE</div>
+    <h2 id="modal-title">Hai trovato il reparto segreto.</h2>
+    <p id="modal-text">Questo sito è mantenuto da un comitato di criceti e di ragazzetti ok.</p>
+    <div class="modal-actions"><button class="btn dark" id="close-modal">Ricevuto, credo</button></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // Archivio locale: il fatto in evidenza viene scelto in base al giorno dell'anno.
+  // Per aggiungere contenuti basta aggiungere elementi a questi array.
+    const facts = [
+    {title:"I polpi hanno tre cuori.", text:"Due pompano sangue verso le branchie, mentre il terzo lo manda al resto del corpo. Durante il nuoto, il cuore sistemico smette temporaneamente di battere: forse anche lui preferisce farsi una pausa.", source:"Biologia marina"},
+    {title:"I wombat producono feci a forma di cubo.", text:"La forma si sviluppa nell'intestino grazie a differenze di elasticità dei tessuti. Non è una scelta estetica, ma è comunque un design molto deciso.", source:"Zoologia"},
+    {title:"Oxford è più antica dell'impero azteco.", text:"L'insegnamento a Oxford è attestato già nell'XI secolo. L'impero azteco si sviluppò molti secoli dopo. La timeline storica è un posto strano.", source:"Storia"},
+    {title:"Su Venere un giorno dura più di un anno.", text:"Venere impiega circa 243 giorni terrestri per ruotare una volta sul proprio asse e circa 225 per orbitare intorno al Sole.", source:"Astronomia"},
+    {title:"Le banane sono bacche, le fragole no.", text:"In botanica, la classificazione dei frutti dipende dalla struttura del fiore e dell'ovario. Il reparto ortofrutta non ha seguito il memo.", source:"Botanica"},
+    {title:"Gli squali esistevano prima degli alberi.", text:"Le prime linee evolutive degli squali risalgono a centinaia di milioni di anni fa, prima della comparsa dei primi alberi conosciuti.", source:"Paleontologia"},
+    {title:"La Torre Eiffel cambia altezza.", text:"Il metallo si espande con il calore: nelle giornate calde la torre può diventare più alta di alcuni centimetri.", source:"Fisica"},
+    {title:"Il miele può conservarsi per tempi lunghissimi.", text:"La sua bassa attività dell'acqua e l'acidità ostacolano molti microrganismi. Deve però essere conservato correttamente e non contaminato.", source:"Alimentazione"},
+    {title:"Un fulmine è più caldo della superficie del Sole.", text:"Il canale di un fulmine può raggiungere temperature di circa 30.000 °C per una frazione di secondo, molto più della superficie solare.", source:"Meteorologia"},
+    {title:"La Luna si allontana lentamente dalla Terra.", text:"La distanza media aumenta di circa 3,8 centimetri all'anno, soprattutto a causa delle interazioni mareali tra Terra e Luna.", source:"Astronomia"},
+    {title:"I gatti non percepiscono il dolce come noi.", text:"I gatti domestici hanno perso parte della funzionalità del recettore che negli esseri umani contribuisce alla percezione del sapore dolce.", source:"Etologia"},
+    {title:"Le impronte digitali dei koala sono molto simili a quelle umane.", text:"Le creste sui polpastrelli dei koala possono ricordare quelle umane anche al microscopio. Evoluzione: ricicla, ma con stile.", source:"Zoologia"},
+    {title:"L'acqua può bollire e congelare nello stesso momento.", text:"In condizioni specifiche di pressione e temperatura, al punto triplo, ghiaccio, acqua liquida e vapore possono coesistere in equilibrio.", source:"Termodinamica"},
+    {title:"Saturno ha una densità media inferiore a quella dell'acqua.", text:"La sua densità media è circa 0,69 g/cm³. L'idea che galleggerebbe in una vasca è una metafora: una vasca abbastanza grande non sarebbe molto pratica.", source:"Planetologia"},
+    {title:"Le api possono imparare a distinguere alcuni volti.", text:"In esperimenti, le api hanno imparato a discriminare immagini di volti umani usando semplici strategie visive, senza riconoscere le persone come facciamo noi.", source:"Ricerca cognitiva"},
+    {title:"La luce del Sole impiega circa 8 minuti per arrivare qui.", text:"La luce viaggia a circa 300.000 km/s e percorre la distanza media Sole-Terra in poco più di otto minuti. Guardare il Sole è guardare il passato recente.", source:"Fisica"},
+    {title:"Il nome scientifico del gorilla occidentale include 'gorilla'.", text:"È Gorilla gorilla: una delle occasioni in cui la nomenclatura scientifica decide di non complicarti la vita.", source:"Tassonomia"},
+    {title:"Il cuore di una balenottera azzurra è enorme.", text:"È tra i cuori più grandi del regno animale e può pesare centinaia di chilogrammi. Le misure precise variano tra individui e fonti.", source:"Zoologia"},
+    {title:"I dinosauri non aviari e gli esseri umani non si sono mai incontrati.", text:"Tra l'estinzione di massa di 66 milioni di anni fa e la comparsa di Homo sapiens passa un intervallo enorme. Gli uccelli, invece, sono dinosauri viventi.", source:"Paleontologia"},
+    {title:"La parola 'muscolo' viene da un termine latino che significa 'topolino'.", text:"Musculus è un diminutivo di mus: alcuni muscoli, quando si contraggono sotto la pelle, ricordavano un piccolo topo in movimento.", source:"Etimologia"},
+    {title:"Le nuvole possono pesare centinaia di tonnellate.", text:"Una nube cumulus può contenere una grande massa d'acqua distribuita in minuscole gocce, ma resta sospesa grazie ai moti dell'aria e alla dimensione delle gocce.", source:"Scienze della Terra"},
+    {title:"Il cervello consuma molta energia rispetto alla sua massa.", text:"Nell'adulto a riposo rappresenta circa il 2% della massa corporea ma utilizza intorno al 20% dell'energia consumata dall'organismo.", source:"Neuroscienze"},
+    {title:"La parola 'robot' è diventata famosa grazie a un'opera teatrale.", text:"Il termine fu reso popolare dalla pièce R.U.R. di Karel Čapek, rappresentata nel 1921. L'etimologia è legata a parole slave associate al lavoro.", source:"Storia della tecnologia"},
+    {title:"Alcune tartarughe possono respirare in parte attraverso la cloaca.", text:"In alcune specie acquatiche, superfici vascolarizzate nella regione cloacale contribuiscono agli scambi gassosi durante immersioni prolungate.", source:"Zoologia"},
+    {title:"Il profumo della pioggia ha un nome: petricore.", text:"Il termine descrive l'odore tipico che si avverte quando la pioggia cade su terreno asciutto; contribuiscono sostanze vegetali e composti prodotti dai batteri del suolo.", source:"Chimica"},
+    {title:"Una giornata su Marte dura poco più di 24 ore.", text:"Un sol marziano dura circa 24 ore e 39 minuti. È abbastanza vicino al nostro giorno da rendere gli orari quasi gestibili.", source:"Astronomia"},
+    {title:"I corvi possono ricordare volti umani.", text:"Studi sperimentali suggeriscono che alcuni corvidi distinguono e ricordano persone associate a esperienze negative o positive. Meglio non litigare con il quartiere.", source:"Etologia"},
+    {title:"Il vetro non è un liquido che scorre lentamente.", text:"Il vetro comune è un solido amorfo: la sua struttura non è cristallina, ma non cola in modo apprezzabile a temperatura ambiente.", source:"Scienza dei materiali"},
+    {title:"Un giorno terrestre non dura esattamente 24 ore in senso astronomico.", text:"Le 24 ore dell'orologio sono il giorno solare medio. La rotazione rispetto alle stelle dura circa 23 ore e 56 minuti.", source:"Astronomia"},
+    {title:"Le lontre marine a volte si tengono per mano mentre riposano.", text:"Questo comportamento è stato osservato in alcune lontre marine e può aiutare a evitare che gli animali si separino mentre galleggiano.", source:"Etologia"},
+    {title:"Il DNA umano è condiviso in gran parte con altri organismi.", text:"Molti geni e meccanismi cellulari sono antichi e condivisi tra specie. Le percentuali di somiglianza cambiano a seconda di cosa si confronta: il contesto conta.", source:"Genetica"},
+    {title:"Le impronte digitali si formano prima della nascita.", text:"Le creste delle dita iniziano a svilupparsi durante la vita fetale. La loro disposizione dipende da fattori genetici e da piccole variazioni dell'ambiente in cui cresce il feto.", source:"Biologia"},
+    {title:"La Terra non è una sfera perfetta.", text:"La rotazione terrestre la rende leggermente schiacciata ai poli e più larga all'equatore. La forma reale è ancora più irregolare e viene descritta, per molti scopi, come un geoide.", source:"Geofisica"},
+    {title:"La luce può essere rallentata in un materiale.", text:"Nel vuoto viaggia alla velocità massima di circa 300.000 km/s. Quando attraversa materiali come acqua o vetro, la sua velocità di propagazione è inferiore.", source:"Ottica"},
+    {title:"Il ghiaccio galleggia sull'acqua liquida.", text:"Quando l'acqua congela, la sua struttura cristallina occupa più volume. Per questo il ghiaccio è meno denso dell'acqua liquida, una proprietà importante per la vita nei laghi in inverno.", source:"Chimica"},
+    {title:"Il suono non si propaga nel vuoto.", text:"Le onde sonore hanno bisogno di un mezzo materiale, come aria, acqua o metallo, per trasmettersi. Nello spazio, quindi, le esplosioni non producono il classico rumore dei film.", source:"Acustica"},
+    {title:"Un cucchiaino di materia di una stella di neutroni peserebbe moltissimo.", text:"Le stelle di neutroni hanno densità estreme. Una quantità grande quanto un cucchiaino, se potesse essere portata sulla Terra senza cambiare stato, avrebbe una massa dell'ordine di miliardi di tonnellate.", source:"Astrofisica"},
+    {title:"La ISS completa un'orbita in circa 90 minuti.", text:"La Stazione Spaziale Internazionale viaggia a circa 28.000 km/h e compie all'incirca 16 orbite terrestri al giorno. Gli astronauti vedono quindi numerose albe e tramonti ogni 24 ore.", source:"Astronomia"},
+    {title:"Il Sole contiene quasi tutta la massa del Sistema Solare.", text:"La sua massa rappresenta circa il 99,86% della massa complessiva del Sistema Solare. Tutti i pianeti, le lune, gli asteroidi e le comete costituiscono la piccola parte restante.", source:"Astronomia"},
+    {title:"Su Marte si trovano vulcani giganteschi.", text:"Olympus Mons è il più grande vulcano conosciuto del Sistema Solare. È molto più alto dell'Everest rispetto al livello medio delle aree circostanti.", source:"Planetologia"},
+    {title:"Gli anelli di Saturno sono relativamente sottili.", text:"Pur estendendosi per centinaia di migliaia di chilometri, gli anelli principali hanno in molte zone uno spessore verticale molto piccolo rispetto alla loro larghezza.", source:"Planetologia"},
+    {title:"La Via Lattea contiene centinaia di miliardi di stelle.", text:"Le stime variano, ma la nostra galassia ospita probabilmente da decine a centinaia di miliardi di stelle. Il Sole è soltanto una di esse.", source:"Astronomia"},
+    {title:"Le stelle che vediamo possono essere già cambiate.", text:"La luce impiega tempo per raggiungerci. Guardando una stella distante mille anni luce, la osserviamo com'era circa mille anni fa.", source:"Astronomia"},
+    {title:"I fulmini possono colpire più volte lo stesso luogo.", text:"Non è vero che un fulmine non colpisca mai due volte nello stesso punto. Strutture alte, come i grattacieli, possono essere colpite ripetutamente.", source:"Meteorologia"},
+    {title:"L'Antartide è il deserto più grande della Terra.", text:"Un deserto è definito soprattutto dalla scarsità di precipitazioni, non dalla temperatura. L'Antartide riceve pochissime precipitazioni e rientra quindi nella categoria dei deserti polari.", source:"Climatologia"},
+    {title:"Il punto più profondo degli oceani è nella Fossa delle Marianne.", text:"Il Challenger Deep raggiunge una profondità di circa 11 chilometri, anche se le misure esatte variano in base alle rilevazioni e ai metodi utilizzati.", source:"Oceanografia"},
+    {title:"Il bambù può crescere molto rapidamente.", text:"Alcune specie di bambù, in condizioni favorevoli, possono allungarsi di decine di centimetri in un solo giorno. La velocità dipende dalla specie e dall'ambiente.", source:"Botanica"},
+    {title:"Gli alberi possono scambiarsi segnali chimici.", text:"Le piante rilasciano composti volatili e possono interagire con organismi del suolo, inclusi funghi associati alle radici. L'espressione «parlare tra alberi» è una semplificazione di processi biologici complessi.", source:"Ecologia"},
+    {title:"Le piante possono percepire la gravità.", text:"Le radici tendono a crescere verso il basso e i germogli verso l'alto. Questo orientamento, chiamato gravitropismo, coinvolge meccanismi cellulari e ormoni vegetali.", source:"Botanica"},
+    {title:"Alcuni semi possono restare dormienti per anni.", text:"In condizioni adatte, la dormienza permette ai semi di attendere il momento favorevole per germinare. La durata varia molto tra specie e condizioni ambientali.", source:"Botanica"},
+    {title:"Le formiche non hanno polmoni.", text:"Respirano attraverso piccole aperture chiamate spiracoli, collegate a una rete di tubi che trasporta i gas all'interno del corpo.", source:"Entomologia"},
+    {title:"Le farfalle assaggiano anche con i piedi.", text:"Molte farfalle possiedono recettori del gusto sulle zampe, che le aiutano a valutare le superfici e a individuare piante adatte alla deposizione delle uova.", source:"Entomologia"},
+    {title:"Le libellule sono predatrici molto efficienti.", text:"Le libellule adulte catturano altri insetti in volo e hanno un'elevata percentuale di successo nella caccia rispetto a molti altri predatori.", source:"Entomologia"},
+    {title:"I coralli sono animali.", text:"I coralli sono costituiti da piccoli animali chiamati polipi. Molte specie vivono in simbiosi con alghe microscopiche che contribuiscono alla loro alimentazione e ai colori.", source:"Biologia marina"},
+    {title:"Le meduse esistono da centinaia di milioni di anni.", text:"Le linee evolutive degli animali simili alle meduse sono molto antiche e precedono di gran lunga la comparsa dei dinosauri.", source:"Paleontologia"},
+    {title:"I delfini usano fischi caratteristici.", text:"Alcune specie, tra cui il tursiope, producono fischi distintivi che possono funzionare in modo simile a segnali individuali per riconoscersi.", source:"Etologia"},
+    {title:"Gli elefanti comunicano anche con suoni molto bassi.", text:"Alcuni richiami degli elefanti contengono infrasuoni, cioè frequenze inferiori a quelle normalmente udibili dagli esseri umani, che possono propagarsi a grandi distanze.", source:"Zoologia"},
+    {title:"Le giraffe hanno lo stesso numero di vertebre cervicali degli esseri umani.", text:"Sia le giraffe sia gli esseri umani hanno normalmente sette vertebre cervicali. Nella giraffa, però, ciascuna è molto allungata.", source:"Anatomia"},
+    {title:"I cavallucci marini hanno una gravidanza maschile.", text:"Nelle specie di cavalluccio marino, la femmina trasferisce le uova in una tasca del maschio, che le custodisce durante lo sviluppo fino al parto.", source:"Biologia marina"},
+    {title:"I pipistrelli sono gli unici mammiferi capaci di volo attivo.", text:"Altri mammiferi, come gli scoiattoli volanti, planano, ma i pipistrelli possono generare portanza e spinta con il movimento delle ali.", source:"Zoologia"},
+    {title:"Le piume degli uccelli derivano da strutture evolutive antiche.", text:"Le piume si sono evolute nei dinosauri molto prima della comparsa degli uccelli moderni e probabilmente inizialmente avevano anche funzioni diverse dal volo.", source:"Evoluzione"},
+    {title:"Il sangue umano non è blu nelle vene.", text:"Il sangue povero di ossigeno è rosso scuro. Le vene possono apparire bluastre perché la pelle e i tessuti assorbono e diffondono le diverse lunghezze d'onda della luce.", source:"Fisiologia"},
+    {title:"La pelle è l'organo più esteso del corpo umano.", text:"La pelle costituisce una barriera protettiva, contribuisce alla regolazione della temperatura e ospita recettori sensoriali. La sua superficie varia in base alla corporatura.", source:"Anatomia"},
+    {title:"Le ossa sono tessuti vivi.", text:"Le ossa vengono continuamente rimodellate da cellule che riassorbono e ricostruiscono il tessuto. Non sono strutture statiche come spesso si immagina.", source:"Biologia umana"},
+    {title:"Il corpo umano emette luce debolissima.", text:"Reazioni metaboliche producono emissioni di fotoni estremamente deboli, troppo fioche per essere viste a occhio nudo nelle normali condizioni.", source:"Biofisica"},
+    {title:"Il cervello non possiede recettori del dolore al suo interno.", text:"Il tessuto cerebrale non percepisce direttamente il dolore come la pelle. Mal di testa e dolore durante procedure mediche possono coinvolgere meningi, vasi sanguigni e altri tessuti sensibili.", source:"Neuroscienze"},
+    {title:"La memoria non funziona come una registrazione video.", text:"Ricordare è un processo ricostruttivo: i ricordi possono essere modificati da nuove informazioni, emozioni e dal contesto in cui vengono richiamati.", source:"Psicologia"},
+    {title:"Il sonno aiuta a consolidare alcuni ricordi.", text:"Durante il sonno avvengono processi che contribuiscono a stabilizzare e riorganizzare informazioni apprese durante la veglia. Il ruolo varia in base al tipo di memoria.", source:"Neuroscienze"},
+    {title:"Le impronte della lingua sono diverse da persona a persona.", text:"La superficie della lingua presenta caratteristiche individuali, ma l'idea di usarne le impronte come identificatore universale è meno consolidata rispetto alle impronte digitali.", source:"Anatomia"},
+    {title:"La risata può essere contagiosa.", text:"Sentire o vedere qualcuno ridere può attivare risposte sociali e motorie che rendono più probabile ridere a propria volta. Il contesto sociale ha un ruolo importante.", source:"Psicologia"},
+    {title:"Il tempo scorre diversamente per chi si muove molto velocemente.", text:"Secondo la relatività ristretta, un orologio in movimento rispetto a un osservatore può accumulare meno tempo rispetto a quello dell'osservatore. L'effetto è reale ma minuscolo alle velocità quotidiane.", source:"Relatività"},
+    {title:"La gravità influenza anche il tempo.", text:"Secondo la relatività generale, un orologio in un campo gravitazionale più intenso procede più lentamente rispetto a uno in un campo meno intenso. L'effetto viene misurato anche con orologi atomici.", source:"Relatività"},
+    {title:"I GPS devono correggere effetti relativistici.", text:"Gli orologi dei satelliti GPS sono influenzati sia dalla velocità orbitale sia dalla gravità più debole rispetto alla superficie terrestre. Senza correzioni, la posizione calcolata accumulerebbe errori importanti.", source:"Fisica"},
+    {title:"Un magnete non ha sempre bisogno di elettricità.", text:"I magneti permanenti mantengono un campo magnetico grazie all'allineamento dei momenti magnetici nei materiali, senza richiedere una corrente elettrica continua.", source:"Elettromagnetismo"},
+    {title:"Il vetro delle finestre non cola in modo apprezzabile.", text:"Il vetro è un solido amorfo, non un liquido che scorre lentamente. Le differenze di spessore nelle vecchie finestre dipendono soprattutto dai metodi di produzione del passato.", source:"Scienza dei materiali"},
+    {title:"L'acqua calda non congela sempre prima di quella fredda.", text:"Il cosiddetto effetto Mpemba è stato osservato in alcune condizioni, ma dipende da vari fattori e non è una regola universale valida per ogni contenitore e situazione.", source:"Fisica"},
+    {title:"Il diamante e la grafite sono fatti di carbonio.", text:"La differenza tra questi materiali dipende da come gli atomi di carbonio sono legati e organizzati nello spazio. La struttura determina proprietà molto diverse.", source:"Chimica"},
+    {title:"Il gallio può fondere vicino alla temperatura corporea.", text:"Il gallio puro fonde a circa 29,8 °C, quindi può diventare liquido in una mano abbastanza calda. Non va però ingerito né usato senza precauzioni.", source:"Chimica"},
+    {title:"Il numero zero ha avuto una storia lunga e complessa.", text:"L'uso dello zero come segnaposto e come numero si è sviluppato in diverse tradizioni matematiche. Il suo ruolo è fondamentale nel sistema posizionale moderno.", source:"Storia della matematica"},
+    {title:"Il simbolo dell'infinito è spesso chiamato lemniscata.", text:"Il simbolo ∞ è noto come lemniscata. Fu introdotto in matematica da John Wallis nel XVII secolo, anche se la scelta esatta della forma non è del tutto certa.", source:"Matematica"},
+    {title:"Una scacchiera ha 64 caselle ma molte più partite possibili.", text:"Il numero di sequenze legali di mosse possibili è enorme, tanto che non si possono elencare tutte le partite di scacchi realistiche una per una.", source:"Matematica"},
+    {title:"Il teorema dei quattro colori riguarda le mappe.", text:"Il teorema afferma che qualsiasi mappa piana può essere colorata con al massimo quattro colori in modo che regioni confinanti lungo un bordo non condividano lo stesso colore.", source:"Matematica"},
+    {title:"Un googol è molto più grande di un miliardo.", text:"Un googol è 10 elevato alla centesima potenza, cioè 1 seguito da 100 zeri. Il nome ha ispirato quello del motore di ricerca Google, con una grafia diversa.", source:"Matematica"},
+    {title:"La parola « algoritmo » è legata a un matematico persiano.", text:"Il termine deriva dalla forma latina del nome di Muhammad ibn Musa al-Khwarizmi, studioso che contribuì alla diffusione di metodi matematici.", source:"Storia della matematica"},
+    {title:"La prima webcam famosa controllava una caffettiera.", text:"All'Università di Cambridge fu installata una telecamera per controllare da remoto la caffettiera del laboratorio Trojan Room, evitando viaggi inutili quando era vuota.", source:"Storia dell'informatica"},
+    {title:"Il primo messaggio SMS fu inviato nel 1992.", text:"Il messaggio di prova era «Merry Christmas» e venne inviato nel Regno Unito. All'epoca i telefoni non avevano ancora le tastiere moderne per scrivere messaggi facilmente.", source:"Tecnologia"},
+    {title:"Il codice QR è nato per tracciare componenti industriali.", text:"Fu sviluppato in Giappone negli anni Novanta per identificare rapidamente componenti nella produzione automobilistica. In seguito è diventato comune in molti altri contesti.", source:"Tecnologia"},
+    {title:"Il primo dominio .com risale al 1985.", text:"Symbolics.com fu registrato nel marzo 1985 ed è generalmente riconosciuto come il primo dominio .com registrato.", source:"Storia di Internet"},
+    {title:"La modalità aereo non è nata per risparmiare batteria.", text:"La funzione è stata pensata per disattivare le trasmissioni radio dei dispositivi durante i voli. Può anche ridurre i consumi, ma quello non è il suo scopo originario.", source:"Tecnologia"},
+    {title:"La tastiera QWERTY non è l'unico layout possibile.", text:"Esistono layout come AZERTY, QWERTZ e Dvorak, progettati per lingue o obiettivi differenti. La disposizione più diffusa dipende anche dalla storia e dall'abitudine.", source:"Informatica"},
+    {title:"I libri stampati con caratteri mobili si diffusero in Europa nel XV secolo.", text:"La stampa a caratteri mobili di Johannes Gutenberg contribuì a rendere più rapida la produzione di libri e a diffondere testi su scala più ampia.", source:"Storia"},
+  ];
+
+  const jokes = [
+    ["La rana","Animali","Un uomo va al supermercato e trova su uno scaffale una 'rana che fa i bocchini' a 5 euro. Incuriosito chiede spiegazioni, ma il commesso rassicura che la rana effettivamente opera degli ottimi bocchini. L'uomo compra in fretta e furia la rana e torna a casa. Dopo qualche ora la moglie torna a casa e sente dei rumori provenire dalla camera da letto. Si avvicina e sente «sedano carota e cipolla, quack», e di nuovo «sedano carota e cipolla, quack». A tal punto entra in camera e chiede «Ao, ma che stai a fa»? e il marito risponde «Statte zitta che se questa se impara a fa il ragù tu te levi dal cazzo»."],
+    ["Il cavallo", "Assurde", "Cosa dice un cavallo che entra in un bar?\n«Prrrrr»"],
+    ["Il cinese", "Assurde", "Cosa dice un cinese che entra in un bar?\n«Un caffè corretto, per piacere»"],
+    ["I tre desideri", "Assurde", "Tre tizi sono nel deserto quando trovano una lampada. Uno di loro lo raccoglie, lo strofina e... zac, esce un Genio. Bomba “Finalmente mi avete liberato dopo tutti questi anni, quindi esaudirò tre desideri a ciascuno di voi.“ Il primo tizio sbotta subito “Voglio un miliardo di dollari.“ POOF, sta tenendo in mano una stampa che mostra che il saldo del suo conto è ora, infatti, 1.000.000.003,50 Il secondo uomo ci pensa un po', poi dice “Voglio essere l'uomo più ricco del mondo.“ POOF, sta tenendo in mano dei documenti che mostrano che il suo patrimonio netto è ora ben oltre i 100 miliardi. Il terzo tizio pensa ancora più a lungo al suo desiderio, poi dice “Voglio che il mio braccio sinistro ruoti in senso orario per il resto della mia vita.“ POOF, il suo braccio inizia a ruotare. Il Genio dice loro che è ora del secondo desiderio. Il primo tizio dice: “Voglio sposare la donna più bella del mondo.“ POOF, una bellezza mozzafiato si avvolge attorno al suo braccio. Il secondo tizio dice “Voglio essere bello e carismatico, così posso avere ogni ragazza che voglio.“ POOF, il suo aspetto cambia e la moglie del primo tizio inizia subito a flirtare con lui. Il terzo tizio dice “Voglio che il mio braccio destro ruoti in senso antiorario fino alla mia morte.“ POOF, ora entrambe le sue braccia ruotano, in direzioni opposte. Il genio dice loro di pensare molto attentamente al loro terzo desiderio. Il primo tizio lo fa, e dopo un po' dice “Non voglio mai ammalarmi o ferirmi, voglio rimanere in salute fino alla mia morte.“ POOF, il suo incarnato migliora, l'acne è sparita e le ginocchia non gli danno più fastidio. Il secondo tizio dice “Non voglio mai invecchiare. Voglio rimanere per sempre a 29 anni.“ POOF, sembra già più giovane. Il terzo tizio sorride trionfante e dice “Il mio ultimo desiderio è che la mia testa annuisca avanti e indietro.“ POOF, ora sta annuendo con la testa e si dimena ancora con le braccia. Il genio augura loro buona fortuna, scompare e gli uomini presto vanno per la loro strada. Molti anni dopo si incontrano di nuovo e chiacchierano di come sono andate le cose. Il primo tizio è estasiato: “Ho investito i soldi e li ho moltiplicati molte volte, quindi io e la mia famiglia saremo tra i più ricchi dei ricchi praticamente per sempre. Mia moglie è una pazza a letto, e non mi sono mai preso nemmeno un raffreddore in tutti questi anni.“ Il secondo tizio sorride e dice “Beh, ho costruito organizzazioni di beneficenza in tutto il mondo con una frazione della mia ricchezza, sono ancora il tizio più ricco del mondo e venerato anche per le mie buone azioni. Non sono invecchiato di un giorno da quando ci siamo incontrati l'ultima volta, e sì, tua moglie è piuttosto scatenata a letto.“ Il terzo tizio entra, dimenando le braccia e annuendo con la testa, e dice: “A rega ho fatto una cazzataaaa.“"],
+      ["Il ginecologo sordo","Freddure","Che cosa fa un ginecologo sordo? Legge le labbra."],
+  ["Fermo o spariamo","Giochi di parole","La polizia a un ladro: «Fermo o spariamo!». Il ladro: «Sparite pure»."],
+    ["L'intervista","Totti","\"Nome?\" \"Francesco.\" \"Cognome?\" \"Totti\" \"Nato?\" \"Sì\""],
+  ["Il puzzle","Totti","Totti cerca di finire un puzzle. Ci mette quasi quattro mesi. Poi gira la scatola e legge: “dai due ai tre anni”. Commenta: “Ahò, ma allora sò un genio!!!”."],
+  ["La biblioteca di Totti","Totti","Una notizia tragica letta sui giornali: “È bruciata la biblioteca di Totti, conteneva due libri”. Totti è disperato: “Ahò, er secondo dovevo ancora finillo de colorare!!”"],
+  ["Totti da Marzullo","Totti","Gigi Marzullo invita Totti in trasmissione e lo intervista per sfatare il mito del calciatore ignorante: “Lei ha mai letto un libro?”. “Sì, leggetti Rin Tin Tin!”. “Lessi!” lo riprende Marzullo. “No no, mo 'o ricordo bene, nun era Lessi era proprio Rin Tin Tin”."],
+  ["Totti a Chi vuol essere milionario","Totti","Gerry Scotti invita Francesco Totti a “Chi vuol essere milionario” e gli chiede: “Alfred Nobel ha inventato: il tritolo, la bomba, il bazooka o la dinamite?”. E Totti, sicuro: “'A dinamite, no?”. Gerry Scotti: “L'accendiamo?”. Totti impaurito: “Ma che sei scemo?!”."],
+  ["Sommario","Totti","La fidanzata Ilary regala un libro a Totti, lui lo apre e legge: “Sommario... Piacere, sò Francesco!”"],
+  ["Masticazzi","Totti","Totti a scuola. L'insegnante gli chiede: “Totti, fammi il passato remoto di masticare”. E Totti: “Facile... masticazzi”."],
+  ["Apollo","Totti","La maestra chiede a Totti: “Francesco, chi era la madre di Apollo...?” “'A gallina!”"],
+  ["Call center","Totti","Totti chiama un call center: “Senta, vorrei prenotà 'na telefonata...”. L'operatrice: “Bene, deve comporre il numero 10 sulla tastiera”. Totti dopo un attimo di pausa: “E come faccio? I tasti sur telefono mio arrivano a 9!!!”."],
+  ["Il cecèno","Totti","Totti è fermo con la sua auto al semaforo. Si avvicina un bambino povero, bussa al finestrino e dice: “Signore, mi dà un euro?”. Totti: “Ahò, e perché te dovrei dà 'n euro?”. “Signore, io cecèno”. Totti: “Sì, e che ce ceni co' 'n euro? Ar massimo ce fai 'a colazione”."],
+  ["Le radici quadrate","Totti","Durante gli allenamenti a Trigoria un giornalista chiede a Totti: “Francesco, per sfatare certe voci che ti descrivono come un ignorante, volevo chiederti: ma tu le sai estrarre le radici quadrate?”. Totti: “Sì, 'o so fà ma nun lo faccio, senno me se stirano i muscoli dé 'e cosce!”."],
+  ["Hijo de puta!","Totti","Finale di Coppa Italia 2003: Roma-Milan. Totti entra in scivolata su Redondo, facendo fallo. Redondo sbotta: “Hijo de puta!”. Totti: “Ahò, ciài raggione... Piacere... Io de Trastevere!”."],
+  ["Le mie cose","Totti","Totti ha portato la fidanzata al mare, a Ostia. Fa caldo, ma lei non accenna a bagnarsi. Allora Totti premuroso: “Amò, vatte a fà er bagno”. Lei: “Amò, ciò 'e cose mie”. Totti: “Amò, nun te preoccupà, te 'e guardo io!!!”."],
+  ["Curriculum scolastico","Totti","I tre anni più duri per Totti? Quelli della prima elementare."],
+  ["Vieni al Cepu","Totti","Totti sta registrando un promo per la tv: “Vieni al Cepu, ci ho andato anch'io!”."],
+  ["Cepu","Totti","A un esame di italiano del Cepu il professore domanda a Totti: “Mi saprebbe recitare la poesia 8 marzo?”. E lui: “Bé... 8 m'arzo, 8 e un quarto faccio colazione, 8 e mezzo sto a allenamme a Trigoria...!!!”."],
+  ["Cepu 2","Totti","Totti e Del Piero si incontrano nei corridoi del Cepu durante l'intervallo. Totti: “Ciao Alex, come stai? Ti vedo triste stamattina”. Del Piero: “Eh sì, mi hanno interrogato in storia e ho preso un brutto voto!”. Totti: “Perché? Cosa hai sbagliato?”. Del Piero: “Una domanda facile, quasi cretina, ma sai quando sei davanti al prof. ti viene la cagarella...”. Totti: “E che ti ha chiesto?”. Del Piero: “Mi ha chiesto: ‘Come si chiamava Volta?’ e io non ho saputo rispondere!!!”. Totti: “Ma dài, questa era proprio facile, la sapevo pure io che non studio mai, era impossibile sbagliare!”. Del Piero: “Ma davvero tu sai come si chiamava il signor Volta?”. Totti: “Certo che ce lo so: Giontra!!!”."],
+  ["Cepu 3","Totti","Totti all'esame d'inglese del Cepu. Il professore: “Mi traduca questa frase: ‘Che Dio t'assista’”. Totti senza pensarci risponde: “What God taxi driver!”."],
+  ["Cepu 5","Totti","Totti deve fare un esame di geografia. Il professore: “Signor Totti, mi parli dell'Arabia...”. E Totti: “L'Arabbia è quela cosa che me vié quanno nun riesco a fà gol...”."],
+  ["Cepu 7","Totti","Totti si iscrive al Cepu e alla prima lezione il tutor gli dice: “Oggi facciamo una lezione facile facile, dimmi cinque nomi di animali che incominciano con la e... Per esempio... ermellino...”. E Totti: “Ermellino... er gatto... er topo ... er cavallo... er cane...”."],
+  ["Cepu 9","Totti","Totti all'esame di scienze. Il professore: “Totti, dimmi il nome di un rettile...”. E Totti: “'A vipera!”. Il professore: “Bravo, facciamo progressi... Ora dimmi il nome di un altro rettile...”. E Totti: “'N 'antra vipera!”."],
+  ["50 per cento","Totti","Totti dice a un amico: “Guarda, ho trovato in edicola un libro interessantissimo!”. “E come si intitola?”. Totti: “Come risolvere il 50% dei tuoi problemi”. L'amico: “E l'hai acquistato?”. “Sì, ne ho comprati due...”."],
+  ["Le gomme","Totti","Totti deve cambiare le gomme della sua Porsche. Va dal gommista e gli dice: “Ahò, me dà dé 'e gomme pé 'a machina”. Allora il gommista, entusiasta di avere Totti nel suo negozio, tutto eccitato gli offre il meglio che ha: “Che ci montiamo, quelle Pirelli?”. E Totti: “Ma che pé i relly, quelle pé 'a strada!”."],
+    ["La multa","Carabinieri","«Agente, perché mi ha fermato?»\n«Andava a 80 in una zona da 50.»\n«Ma il cartello diceva A80!»"],
+    ["Ad una missione nello spazio", "Carabinieri", "Ad una missione nello spazio partecipano un cane, un gatto ed un carabiniere. Dalla base chiamano via radio: “Base chiama Apollo 3, rispondete!”. Il cane, dopo aver messo le cuffie, risponde: Bau...Bau - OK Apollo 3, hai posizionato il braccio meccanico per l’espulsione del satellite? - Bau...Bau.. - OK Apollo 3, hai impostato la rotta sul computer? - Bau...Bau... - OK Apollo 3, ora passami il gatto. Il gatto, prendendo le cuffie dal cane, risponde: Miao...Miao...- OK hai impostato la rotta geostazionaria sul computer del satellite? - Miao...Miao... - OK hai fatto i rilevamenti per le analisi al rientro? - Miao...Miao... - OK ora passami il carabiniere. “Dite pure base!”. “Hai dato da mangiare al cane e al gatto?”. “Certo!”. “ OK ora non toccare più niente, mi raccomando!”."],
+  ["Carabiniere dal dottore", "Carabinieri", "Carabiniere dal dottore: “Dottore, se mi tocco qui ho male (indicando il fegato). Pure se mi tocco qui ho male (indicando la milza). E anche se mi tocco qui (indicando il gomito).Ecc, ecc. Cosa può essere?”. Il dottore: “Mi sa che lei ha un dito fratturato!”"],
+  ["Un amico spiega ad un carabiniere cos’è la logica", "Carabinieri", "Un amico spiega ad un carabiniere cos’è la logica: “Ora ti spiego, io ho un acquario, cosa ti fa pensare?” “All’acqua!” “E l’acqua?” “Al mare!” “E il mare?” “Alle donne in spiaggia!” “Vedi, a te l’acquario secondo la logica ti ricorda le belle donne”. Il Carabiniere torna in caserma e dice ad un suo collega: “Stasera ho imparato la logica!” E l’altro: “Cos’è?”. “Ora ti spiego: hai un acquario in casa?”. “Io no...”. “Allora sei un frocio!”"],
+  ["Un carabiniere passeggia disinvolto per", "Carabinieri", "Un carabiniere passeggia disinvolto per le vie della città. Ad un certo punto vede un tizio in piedi sopra un camion pieno di mele che sbuccia le mele, getta via la polpa e mette in un sacchetto tutti i semi. Incuriosito il carabiniere gli chiede: “Ma cosa fai? Getti via le mele?”. L’uomo del camion sicuro di sé : “Certo! Ma lei non lo sa che i semi delle mele sviluppano l’intelligenza!?”. Il carabiniere sempre più incuriosito gli chiede: “E che cosa ne fa dei semi? Li vende?”. E l’uomo: “Certamente!”. “E quanto costano?”. “5000 lire l’uno!”. “ Ok! Voglio provarli: me ne dia tre”. L’uomo prende le 15.000 lire dal carabiniere e consegna i tre semi. Il carabiniere se li mangia e poi pensa ad alta voce: “Cavolo! Ma con 15.000 lire mi compravo 15 kg di mele, le sbucciavo ed avevo molti più semi”. E l’uomo “Vede già è diventato più intelligente di prima !”. E il carabiniere: “Cavolo, ha ragione me ne dia altri tre”."],
+  ["Oggi è una giornata nera", "Carabinieri", "“Oggi è una giornata nera” come disse il carabiniere assistendo alla nascita del figlio di colore."],
+  ["Un carabiniere entra in un", "Carabinieri", "Un carabiniere entra in un grande magazzino dove trova in vendita degli occhiali “che spogliano”. Malgrado il costo elevato si lascia convincere a comprarli e uscito dal negozio si rende conto che effettivamente vede le donne “nude”. Dopo aver passato il pomeriggio a “divertirsi” ritorna a casa deciso a mostrare gli occhiali magici alla moglie. Entra, ma non la trova, la cerca in tutte le camere e alla fine entra in camera da letto e trova la moglie e un suo collega completamente nudi sdraiati a letto. Un po’ sorpreso il carabiniere si toglie gli occhiali e vede ancora tutti nudi. Allora esclama: “Maledizione! Se penso che ho pagato questi occhiali 300.000 lire e si sono già rotti!”."],
+  ["Il giorno dopo l’acquisto di", "Carabinieri", "Il giorno dopo l’acquisto di un acquario la moglie chiede al marito carabiniere: “Caro, hai cambiato l’acqua ai pesci ?”. “No! Non hanno ancora bevuto quella di ieri !”."],
+  ["Lo sai come si riconosce", "Carabinieri", "Lo sai come si riconosce un carabiniere in un sottomarino?…È quello che ha il paracadute!!"],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Brigadiere, per caso conosce un uomo con un braccio di nome Giuseppe?”. “Marescià, non saprei... Come si chiama l’altro braccio?”"],
+  ["Nell’intervallo tra due numeri di", "Carabinieri", "Nell’intervallo tra due numeri di acrobazia il presentatore propone un gioco per coinvolgere il pubblico. Si tratta di superare tre prove per vincere un 100 milioni: 1) bere in 1 minuto 20 grappini; 2) tagliare la criniera di un ferocissimo leone; 3) sodomizzare una vecchia di 80 anni. Si presenta il primo: crolla dopo 10 grappini, il secondo ha troppa paura del leone, il terzo.... (inventate un po’ voi). Finché si presenta alla gara un aitante carabiniere di 20 anni, orgoglio dell’arma. In 30 secondi si scola i grappini. Poi, un po’ barcollante, entra nella gabbia, che viene celata al pubblico da un enorme telone. Inizia così una lotta furibonda che il pubblico può solo intuire. Finché, dopo qualche minuto, il ruggito di resa del leone; poi il silenzio. Il tendone si alza, il carabiniere, uscendo dalla gabbia, tutto stracci, esclama: “E adesso <hic!> dov’è la vecchia che la rapo a zero!”."],
+  ["Un carabiniere e sua moglie", "Carabinieri", "Un carabiniere e sua moglie decidono di adottare un figlio. Vanno in Cambogia e scelgono un piccolo cambogiano di pochi mesi. Tornati in Italia si recano a Napoli dove ha sede l’Istituto di Lingue Orientali e chiedono al Direttore di poter frequentare i corsi di lingua khmer. “Come mai?” chiede il Direttore. E il carabiniere: “Abbiamo adottato un piccolo cambogiano. Fra poco incomincerà a parlare e vorremmo capire che cosa dice!”."],
+  ["Un carabiniere è in volo", "Carabinieri", "Un carabiniere è in volo di addestramento ai comandi di un jet. Terminata la sua esercitazione la torre di controllo gli ordina il rientro: “Qui torre di controllo. Appuntato Esposito, rientrare alla base!”. “Qui appuntato Esposito in fase di avvicinamento ... mi trovo a 500 metri dalla pista di atterraggio...”. “Bene, atterraggio autorizzato! Esegua pure le manovre di rientro!”. “Negativo, torre di controllo! Non posso atterrare! La pista è troppo corta!”. “Non dica idiozie, appuntato! Atterri e basta!”. “Non posso, la pista è troppo corta!”. “Esegua gli ordini senza discutere!”. “Ma la pista è troppo corta!”. “Niente ma! Atterri e basta!”. Il carabiniere allora atterra, ma spezza le ali e distrugge l’aereo”. Il tenente corre con i soccorsi al recupero del carabiniere. Si avvicina al rottame dell’aereo e il carabiniere gli dice: “Gliel’avevo detto, signor tenente, che la pista era troppo corta!”, poi girando la testa a destra e a sinistra: “Ammazza però quant’è larga...!”."],
+  ["Due carabinieri discutono se un", "Carabinieri", "Due carabinieri discutono se un certo albero è maschio o femmina. Allora chiedono un parere ad un taglialegna che dice: “Mettetevi di lato all’albero. Ecco, considerando i due coglioni ai lati direi che deve essere maschio!”."],
+  ["Perché i carabinieri non fanno", "Carabinieri", "“Perché i carabinieri non fanno più l’amore?”. “Perché non hanno più prove per metterlo dentro!”"],
+  ["Per arrestare la caduta dei", "Carabinieri", "Per arrestare la caduta dei capelli bisogna chiamare i carabinieri!"],
+  ["Alla visita di leva 4", "Carabinieri", "Alla visita di leva 4 aspiranti reclute. - Tu, leggi il cartello! - Funicolare di Como. - Bene abile arruolato destinazione alpini. Avanti un altro. - Tu, leggi il cartello! - Funicolare di Como. - Bene abile arruolato destinazione fanti. Avanti un altro. - Leggi il cartello! - Funicolare di Como. - Bene abile arruolato destinazione alpini. Avanti un altro. - Leggi il cartello! - (con accento siculo) Fu Nicola RE di Como. - Abile arruolato destinazione carabinieri."],
+  ["Al quartier generale dell’arma dei carabinieri", "Carabinieri", "Al quartier generale dell’arma dei carabinieri: “Appuntato, mi chiami l’ascensore!”. “Subito, signor maresciallo ... Asceeensoooreeee...”.”Ma no! Col dito!”. E l’appuntato (col dito in bocca): “Ascensoreeee!”."],
+  ["Un carabiniere è in auto", "Carabinieri", "Un carabiniere è in auto con un cucchiaio fuori del finestrino. Cosa sta facendo? Imbocca la strada!"],
+  ["Carabinieri in auto", "Carabinieri", "Carabinieri in auto: “Controlla le frecce...”. L’altro carabiniere: “Perché? Non usavamo le pistole?”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Maresciallo, correte, ci hanno rubato la macchina!”. “Accidenti, avete visto chi è stato?”. No, ma abbiamo preso il numero della targa!”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: perché sulla portiera delle gazzelle c’è scritto “Carabinieri”? Perché sennò entrano dal cofano."],
+  ["Un carabiniere al capitano mentre", "Carabinieri", "Un carabiniere al capitano mentre sta leggendo il giornale: “Capitano, è morto Tusi!”. “Ma no è impossibile: è in ferie!”. “Ma è scritto sul giornale: Incidente d’auto: morti 3, 4 con...tusi!”."],
+  ["Perché i carabinieri in auto", "Carabinieri", "Perché i carabinieri in auto usano gli scarponi? Per scalare le marce!"],
+  ["Perché i carabinieri quando si", "Carabinieri", "Perché i carabinieri quando si rompe l’auto sparano al motore ? Per non far soffrire i cavalli."],
+  ["Macchina dei carabinieri rovesciata Era", "Carabinieri", "Macchina dei carabinieri rovesciata. Era per svuotare i posacenere!"],
+  ["Su un tavolo c’è una", "Carabinieri", "Su un tavolo c’è una torta e attorno Babbo Natale, la Befana, un carabiniere intelligente, un carabiniere stupido. Un attimo di buio e la torta scompare: chi l’ha mangiata? Dunque Babbo Natale, la Befana, il carabiniere intelligente non esistono..."],
+  ["Perché i carabinieri non inseguono", "Carabinieri", "Perché i carabinieri non inseguono mai i banditi per i campi? Perché così non rischiano di essere seminati!"],
+  ["Perché i carabinieri hanno i", "Carabinieri", "Perché i carabinieri hanno i baffi ? Perché sulla lametta c’è scritto “da barba”."],
+  ["Un carabiniere sta facendo una", "Carabinieri", "Un carabiniere sta facendo una crociera su una nave, quando questa urta uno scoglio e incomincia a inabissarsi. È disperato, ma per fortuna un marinaio lo prende sotto la sua custodia e gli dice: “Vieni con me e fai come faccio io”. Il marinaio prende un’ascia e con pochi colpi decisi recide le funi di una barca di salvataggio. Allora anche il carabiniere prende un’ascia e comincia a dare dei gran colpi sulla barca facendola a pezzi. Il marinaio, inorridito, gli chiede: “Ma che fai?”. E il carabiniere: “Ti aiuto a fare la zattera!”."],
+  ["Un ragazzo entra in un bar e dice", "Carabinieri", "Un ragazzo entra in un bar e dice: “Ho una nuova barzelletta di raccontare sui carabinieri”. Un uomo, seduto ad un tavolo, dice: “Guarda ragazzo, io sono un carabiniere. E vedi il mio amico là? Anche lui è un carabiniere. E quel uomo grosso seduto al tavolo è un carabiniere. Sei sicuro che vuoi raccontare questa barzelletta?”. Il ragazzo pensa un po’ e dice: “No. Non ho voglia di raccontarla tre volte”."],
+  ["Quante sono le barzellette sui", "Carabinieri", "“Quante sono le barzellette sui carabinieri?”. “Due, tutte le altre sono storie vere!”"],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Perché non bisogna raccontare barzellette ad un carabiniere al sabato?”. “Perché sennò ride alla domenica a messa”."],
+  ["Come si fa a far", "Carabinieri", "Come si fa a far ridere un vecchio carabiniere? Gli si racconta una barzelletta da giovane!"],
+  ["Un comico sta raccontando delle", "Carabinieri", "Un comico sta raccontando delle barzellette al pubblico in un bar: “Adesso ve ne racconto una sui carabinieri”. Dal fondo della sala: “Guardi che io sono dell’arma”. “Bene a lei la spiego dopo!”."],
+  ["Il generale sta passando in", "Carabinieri", "Il generale sta passando in rivista una compagnia di carabinieri: “Grinta, perdio!!! Aspetto bellicoso!!!... Aspetto bellicoso, ho detto!!! Sembrate un branco di orfanelle spaurite!! Ma guardateli! Petto in fuori!!! Sguardo fiero!!! Aspetto bellicoso!!!... NON VI FACCIO MUOVERE DI QUI FINCHÈ NON LO VEDO ! FORZA !!! FORZA FEMMINUCCE!!! GRINTA!!! ASPETTO BELLICOSO...”. Un carabiniere: “Speriamo che ‘sto cazzo di Bellicoso arrivi presto, sennò ‘sto stronzo non ci fa manco magnà.. “"],
+  ["Perché i carabinieri corrono sempre", "Carabinieri", "Perché i carabinieri corrono sempre con una mano davanti al berretto? Per non spegnere la fiamma!"],
+  ["Che differenza c’è fra un", "Carabinieri", "Che differenza c’è fra un carabiniere e una bottiglia di birra? Nessuna: sono vuoti entrambi dal collo in su."],
+  ["Perché dopo pranzo i carabinieri", "Carabinieri", "Perché dopo pranzo i carabinieri si contorcono come giocando all’hula-hop? Perché stanno mescolando il caffè!"],
+  ["A scopo di beneficenza viene", "Carabinieri", "A scopo di beneficenza viene organizzata una partita tra l’arma dei carabinieri e la Polizia. Il campo scelto si trova vicino ad una ferrovia. Poco dopo l’inizio della partita passa un treno e fischia fortissimo. I giocatori della Polizia, pensando che la partita sia finita, se ne vanno via. Dopo circa mezz’ora segnano i carabinieri."],
+  ["Perché i carabinieri quando vanno", "Carabinieri", "Perché i carabinieri quando vanno in spiaggia si portano dietro lo sportello dell’automobile? Perché se fa caldo tirano giù il finestrino."],
+  ["Perché i carabinieri hanno le", "Carabinieri", "Perché i carabinieri hanno le strisce rosse sui calzoni? Per trovare le tasche!"],
+  ["Un carabiniere vuol cambiare la", "Carabinieri", "Un carabiniere vuol cambiare la sua vecchia auto, ma il concessionario gli valuta l’auto solo 100.000 lire. In caserma ne parla al maresciallo che gli fa: “Quanti Km ha la tua auto?”. “150.000”. E l’altro: “Fatti furbo! Togli 50.000 Km”. Il carabiniere fa così e va dal concessionario. Giorni dopo torna dal maresciallo: “Marescià, ma lei è un genio! Mi hanno valutato l’auto un milione!”. E il maresciallo: “Bravo, però se fossi in te toglierei altri 50.000 Km”. Così fa e torna dal concessionario e quindi di nuovo dal maresciallo: “Marescià, ma lei è un genio! Mi hanno valutato l’auto 2 milioni!”. “Bravo, fatti furbo! Togline ancora!” gli fa il maresciallo. Il carabiniere va a casa e toglie altri Km fino ad averne solo 8000. Va dal concessionario e poi dal collega: “Marescià, pensi ora la mia auto ha 8000 Km e il concessionario me l’ha valutata ben 2.500.000”. E il maresciallo: “Però, 8000 Km... 2.500.000. Quasi quasi la compro io!”. E il collega: “E no! Adesso che è nuova la tengo io!”"],
+  ["Un carabiniere fissa da 2", "Carabinieri", "Un carabiniere fissa da 2 ore una camera in un hotel. Un collega, meravigliato, gli chiede cosa stia facendo. “Il capo mi ha detto: vai a fissarmi una camera all’hotel!”."],
+  ["Cosa fa un cancro nel", "Carabinieri", "Cosa fa un cancro nel cervello di un carabiniere? Muore di fame!"],
+  ["Carabinieri al posto di blocco", "Carabinieri", "Carabinieri al posto di blocco: “Non lo sa, signora, che non è consentito portare cani in auto?”. “Ma è di pelouche!”. “Guardi che non le ho chiesto la razza!”."],
+  ["In Sicilia la Centrale dei", "Carabinieri", "In Sicilia la Centrale dei carabinieri manda un messaggio a tutte le auto: “Controllare tutte le auto che vanno a Marsala”. Al posto di blocco i carabinieri controllano: “Passi pure, anche questa va a benzina!”."],
+  ["Un carabiniere ferma un automobilista", "Carabinieri", "Un carabiniere ferma un automobilista sospetto. “Documenti, per favore”. L’uomo tira fuori una banconota da centomila e gliela porge facendogli l’occhiolino. Il carabiniere guarda la banconota, guarda l’uomo, poi la riguarda e infine gliela ridà dicendo: “È tutto a posto, vada pure, signor Caravaggio!”."],
+  ["Perché la carta igienica usata", "Carabinieri", "Perché la carta igienica usata dai carabinieri è due volte più lunga? Perché la prima metà è occupata dalle istruzioni."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Ieri ho comprato una cassetta di kiwi”. “Me la presti che la vorrei registrare?”."],
+  ["A due carabinieri regalano due", "Carabinieri", "A due carabinieri regalano due cavalli, ma non sanno come riconoscerli. Il primo propone: “Tagliamo la coda a uno dei due cavalli, così li riconosciamo; proposta accettata, zacchete, ciascuno taglia la coda del suo e ... sono al punto di prima. L’altro propone allora: “Tagliamo a criniera, così li distinguiamo”... zac zac zac zac ... entrambi tagliano la criniera del proprio ... e sono al punto di prima. “Oh caspita, e che si fa, ora? Tagliamo la gamba, così li riconosciamo l’uno dall’altro!”. E si stanno accingendo a questa operazione, quando si avvicina un contadino e chiede che cavolo stiano facendo. “Eh, dobbiamo tagliare una gamba per distinguere il cavallo di uno dal cavallo dell’altro”. E il contadino: “Ma perché non fate così: uno prende il cavallo nero e l’altro quello bianco ?”."],
+  ["Un tizio entra da un", "Carabinieri", "Un tizio entra da un macellaio e vede sulla parete principale alcuni prezzi: Cervello di avvocato: 30mila lire al chilo; Cervello di ministro: 50mila al chilo; Cervello di carabiniere: 150mila al chilo. Domanda allora al gestore: “Come mai il cervello di carabiniere costa così tanto?”. “Ma lei sa quanti carabinieri abbiamo dovuto uccidere per fare un chilo di cervello?”."],
+  ["Caserma dei carabinieri. Entra l’ appuntato", "Carabinieri", "Caserma dei carabinieri. Entra l’ appuntato: “Maresciallo, ho combinato un guaio: mi sono chiuso fuori dalla macchina. Le chiavi sono all’interno e non riesco ad infilare la mano nella fessura del finestrino rimasta aperta”. “Sveglia appuntato!! prenda un pezzo di fil di ferro e cerchi di sbloccare la sicura”. L’appuntato, tutto contento, esce, si dirige verso la macchina e inizia l’operazione. Nel frattempo dal maresciallo entra un altro appuntato che sta ridendo a crepapelle. “Ma che fa ?! Ride nel mio ufficio ?”. “Guardi ho appena visto una scena...C’è uno scemo che si è chiuso fuori dalla macchina e prova ad aprirla con un fil di ferro... Ah! Ah!”. “E allora? A me sembra una buona idea... Infatti gliel’ho suggerita io !!”. “Sì, ma vede, il fatto è che in macchina c’è il collega che gli sta dicendo: “A destra, a destra, sinistra, sinistra”."],
+  ["In chiesa un carabiniere chiede", "Carabinieri", "In chiesa un carabiniere chiede al parroco che ha un braccio fasciato: “Che vi è successo Don Salvatò? “. “Nulla figlioli, ho inciampato nel bidè ... e mi sono rotto un braccio!”. Quindi il parroco si allontana e rimangono soli i due carabinieri. “Marescià, che cos’è sto bidè?”. “E che ne so! Sò dieci anni che non vengo in chiesa!!”."],
+  ["Il maresciallo sta ispezionando la", "Carabinieri", "Il maresciallo sta ispezionando la caserma. Vede una cicca per terra e chiama il carabiniere più vicino: “È tua quella cicca?”. “No, maresciallo, l’avete vista prima voi!”."],
+  ["Un elicottero è precipitato su", "Carabinieri", "Un elicottero è precipitato su un cimitero. I primi ad accorrere sono stati i carabinieri che hanno già recuperato i corpi di oltre 300 vittime."],
+  ["Un carabiniere si reca in", "Carabinieri", "Un carabiniere si reca in un ospedale e al dottore espone il suo desiderio di effettuare una castrazione. Il dottore molto sorpreso per la decisione chiede al carabiniere: “Ma lei è sicuro di quello che vuole fare?”. E il carabiniere: “Sì certo, ne sono convintissimo”. “Ma ne è proprio, ma proprio certo?”. “Guardi, ne ho la certezza assoluta”. Il giorno seguente all’operazione il medico si reca in corsia per le solite visite, e al paziente ricoverato di lato al carabiniere chiede: “Allora come è andata la circoncisione?”. Il carabiniere nel sentire questo dice: “Ecco cosa volevo fare, la circoncisione!”."],
+  ["Due carabinieri sapendo che la", "Carabinieri", "Due carabinieri, sapendo che la vendita di scarpe di coccodrillo può portare a lauti guadagni, danno le dimissioni e partono per l’Africa. Ivi giunti, affittano una canoa e risalgono il fiume. All’improvviso vedono un coccodrillo che nuota beato, uno si tuffa e dopo terribile battaglia alla fine lo solleva fuori dall’acqua. Il suo compagno però lo guarda ed esclama: “Che sfiga, non ha le scarpe, ributtalo in acqua”. Dopo un po’ trovano un altro coccodrillo: uno si tuffa, battaglia all’ultimo sangue, ma dopo averlo sconfitto e sollevato il suo compagno esclama: “Ehhh, ma che scalogna! Anche questo è a piedi nudi, ributtalo dentro”. La stessa scena si ripete varie volte finché i due decidono di rinunciare all’impresa e di ritornare in Italia. Si ripresentano al maresciallo: “Purtroppo ci è andata male, vorremmo essere riassunti”. “Certo, ma come mai avete fallito?”. “Il fatto è che di coccodrilli nell’acqua ne abbiamo trovati tanti, ma erano tutti a piedi nudi, senza scarpe”. Il maresciallo si mette a ridere e poi dice: “Ma siete proprio scemi! Scusate un po’, se erano nel fiume a fare il bagno, le scarpe le avranno lasciate in spiaggia, no?”."],
+  ["Due carabinieri si incontrano", "Carabinieri", "Due carabinieri si incontrano: “Oh! Ciao! È un po’ di tempo che non ci vediamo”. “Eh, sono stato in coma”. “Urca! Ma sei sempre in viaggio!”."],
+  ["Come si riconosce il computer", "Carabinieri", "Come si riconosce il computer dove lavora un carabiniere? È quello con il monitor sporco di bianchetto!"],
+  ["Quando i carabinieri rimangono fermi", "Carabinieri", "Quando i carabinieri rimangono fermi e fissi per ore al supermercato osservando certi prodotti? Quando sull’etichetta c’è scritto: ‘Concentratì."],
+  ["Concorso per carabinieri", "Carabinieri", "Concorso per carabinieri: primo premio, una macchina da scrivere; secondo premio, una macchina già scritta !"],
+  ["Due carabinieri sono condannati alla", "Carabinieri", "Due carabinieri sono condannati alla pena di morte e devono decidere tra la sedia elettrica, la camera a gas e la ghigliottina. Il primo dice: “Allora, la ghigliottina non mi piace perché mi fa troppa impressione tutto quel sangue in terra, nella camera a gas mi sento mancare il fiato... vada per la sedia elettrica”. Viene accompagnato nella sala della sedia elettrica e gli viene data la prima scarica, ma per un difetto della macchina riamane vivo, anche dopo la seconda, è sempre vivo, e così pure dopo la terza al massimo voltaggio. Allora secondo la legge il carabiniere viene graziato perché non è morto neanche dopo tre scariche. Mentre viene riportato fuori il graziato rivede il suo amico e gli dice: “La sedia elettrica non funziona”. Quando tocca al secondo a scegliere il tipo di morte questi dice: “Nella camera a gas mi sento mancare il fiato, la sedia elettrica non funziona, vada per la ghigliottina!”."],
+  ["Un carabiniere a cena da", "Carabinieri", "Un carabiniere a cena da un contadino si vede offrire del salame molto gustoso. Al che il contadino vede il carabiniere prendere i chicchi di pepe e metterseli in tasca. Per non contrariarlo rimane col dubbio e fa finta di nulla. Alla fine della cena gli chiede se gli è piaciuta, e il carabiniere risponde di si, al che il contadino per saggiare il terreno gli chiede: “Anche il salame?” e il carabiniere: “Sì, era ottimo”. A questo punto il contadino rincuorato gliene vuole offrire un po’ per casa e il carabiniere: “No, grazie, ma ho già preso i semi !”."],
+  ["Il nuovo contraccettivo dei carabinieri", "Carabinieri", "Il nuovo contraccettivo dei carabinieri ? Non appena vedono una cicogna le sparano!"],
+  ["Cosa fa un carabiniere con", "Carabinieri", "Cosa fa un carabiniere con un cucchiaio in mezzo alla gente? Si mescola alla folla."],
+  ["Perché i carabinieri quando si", "Carabinieri", "Perché i carabinieri quando si lavano i denti sono circospetti? Perché usano la pasta del capitano!"],
+  ["Perché i carabinieri girano con", "Carabinieri", "Perché i carabinieri girano con la giacca tagliata a metà? Perché è la divisa!"],
+  ["Alla festa annuale dei Carabinieri", "Carabinieri", "Alla festa annuale dei Carabinieri il generale fa il suo intervento e conclude decidendo di fare alcune domande alla platea per dimostrare che in realtà i carabinieri non sono stupidi come si dice. Sceltone uno a caso fra la platea gli chiede come si chiami. Il carabiniere ci pensa un po’ e risponde: “Appuntato Rossi”. Il generale allora chiede: “Appuntato mi dica quanto fa 2+2? “. Il carabiniere dopo tanto pensare risponde: 5? “Noooo appuntato, risposta errata”. La platea di carabinieri all’unisono grida allora: “Gli dia un’altra chance, gli dia un’altra chance”. Il generale acconsente: “Bene. Dimmi allora quanto fa 1+1.” Il carabiniere ci pensa su e poi risponde “3”. “Nooo di nuovo sbagliato” dice indispettito il generale, ma la platea interviene nuovamente: “Gli dia un’altra chance, gli dia un’altra chance”. “D’accordo” riprende il generale “mi dica allora quanto fa 1+2”. Di nuovo Rossi ci pensa su per un po’ e poi risponde “3”. E la platea ancora: “Gli dia un’altra chance, gli dia un’altra chance”."],
+  ["Carabiniere dal dottore", "Carabinieri", "Carabiniere dal dottore: “Dottore, tutte le volte che bevo del caffè ho un forte dolore all’occhio”. “Ha provato a togliere il cucchiaino!”."],
+  ["Tre carabinieri circondano un’edicola di giornali", "Carabinieri", "Tre carabinieri circondano un’edicola di giornali: “È uscito Diabolik?”. “Non ancora”. E il carabiniere ai suoi uomini: “Circondate l’edicola! L’abbiamo beccato, finalmente! “."],
+  ["Un giorno il figlio di", "Carabinieri", "Un giorno il figlio di un carabiniere, tornando dalla scuola (la prima elementare) corre dal padre esultando: Papà, papà, ho preso il miglior voto della classe; la maestra mi ha dato ottimo! Ho fatto le ‘ì più diritte della classe!” e il padre: “Bravo, bravo! Non per niente sei figlio di carabiniere!”. Il giorno successivo il figlio ritorna ancora più contento e, come al solito, corre dal padre: “Papà, papà, ho preso il miglior voto della classe; la maestra mi ha dato ottimo! Ho fatto le ‘ò più tonde della classe!” e il padre: “Bravo, bravo! Non per niente sei figlio di carabiniere!”. L’indomani il figlio torna raggiante e corre dal padre: “Papà, papà, oggi la maestra ha fatto fare a tutti i maschietti un gioco strano!”. “Che gioco?”. “Ci siamo messi tutti in fila e abbiamo visto chi aveva il pisello più lungo. Papà, papà, anche stavolta ho vinto io. È perché sono figlio di carabiniere?”. E il padre: “No, perché hai ventotto anni!”."],
+  ["Un elicottero dei carabinieri precipita", "Carabinieri", "Un elicottero dei carabinieri precipita e muoiono due carabinieri. Viene recuperata la scatola nera da cui risulta che le ultime parole sono state: “Appuntato, lo vogliamo spegnere questo ventilatore, che qui fa troppo vento!”."],
+  ["Esame di un carabiniere molto preparato", "Carabinieri", "Esame di un carabiniere molto preparato: “A quanti gradi bolle l’acqua ? “. Carabiniere: “A 100 gradi”. Il carabiniere esaminatore: “No ! A 90 gradi.... Vai pure, hai sbagliato... “. Ma il carabiniere insiste: “Ma sono sicuro, controlli, l’acqua bolle a 100 gradi !”. Dopo qualche indecisione il maresciallo controlla: “Hai ragione tu, è l’angolo retto che bolle a 90 gradi... “."],
+  ["Il maresciallo interroga il candidato carabiniere", "Carabinieri", "Il maresciallo interroga il candidato carabiniere: “Qual è la capitale d’Italia?”. “Bo”. “Quante regioni ci sono?”. “Bo”. “Quanti capoluoghi?”. “Bo”. “Giovanotto, una domanda facile facile. Qual è la sigla automobilistica di Bologna?”. “Ma”."],
+  ["Esami di ammissione a carabiniere", "Carabinieri", "Esami di ammissione a carabiniere: “Mi dica il nome di tre metalli”. Il candidato: “Uranio, ustagnu, uferru”. “Mi dispiace, ustagnu e uferru vanno bene, ma uranio no; è un insetto!”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Ieri ho fatto un esame e mi hanno bocciato”. “E con che voto?”. “Rh negativo!”."],
+  ["Carabiniere preoccupato al collega", "Carabinieri", "Carabiniere preoccupato al collega: “Domani devo fare l’esame del sangue”. “E allora?”. “Sì, ma non ho studiato niente!”."],
+  ["Durante la prova orale di", "Carabinieri", "Durante la prova orale di un esame per carabinieri viene chiesto al candidato: “Qual è quella cosa con la suola ed il tacco che si mette ai piedi?”. “Ha le stringhe?”. “Si!”. “Allora sono le scarpe!”. “Bravo!”. Questi poi parla con il suo compagno: “Guarda, mi ha chiesto questo e questo”. Il compagno quindi entra nell’aula per l’interrogazione: “Qual è quella cosa con la coda che fa miao?”. “Ha le stringhe?”. “No!”. “Allora è un mocassino!”."],
+  ["Un capitano dei carabinieri finalmente", "Carabinieri", "Un capitano dei carabinieri finalmente prende una licenza e raggiunge la moglie che si trova in villeggiatura sulla riviera romagnola già da un mese. La notte il capitano (dopo un mese di astinenza) chiede alla moglie di scopare. Ma la moglie: “Ma, caro, sei pazzo, i bambini potrebbero sentirci”. “No! Stanno dormendo”. “Sì, ma se si svegliano?”. “Allora andiamo in spiaggia”. La moglie acconsente. In spiaggia mentre si danno da fare li scova una pattuglia della buoncostume: “Altolà. Favorisca i documenti”. Il capitano si presenta: “Sono il capitano xy, sono un vostro collega”. Il carabiniere mettendosi sugli attenti: “Comandi signor capitano! Lei può andare, ma questa puttana la portiamo dentro. È già la terza volta questo mese che la becchiamo a scopare in spiaggia!!!”."],
+  ["Come si fa a bruciare", "Carabinieri", "“Come si fa a bruciare le orecchie ad un carabiniere?”. “Gli si telefona mentre sta stirando!”."],
+  ["Carabiniere sul treno chiede al controllore", "Carabinieri", "Carabiniere sul treno chiede al controllore: “Come mai ci sono tanti scossoni?”. “Perché questa è la vettura di coda!”. “Ma insomma le Ferrovie potevano sopprimerla!”."],
+  ["Perché i carabinieri di rado", "Carabinieri", "Perché i carabinieri di rado hanno una famiglia numerosa? Perché sparano sempre il primo colpo in aria."],
+  ["Figlio di carabiniere torna a", "Carabinieri", "Figlio di carabiniere torna a casa con la pagella con tutti 4. Battendo i pugni sul tavolo (knock, knock) il padre dice: “Ma sei proprio duro, non devi aver preso sicuramente da me”. Al che il figlio: “Papà hanno bussato alla porta”. “Tu aspetta qui: apro io”."],
+  ["Scienziato con un dito nell’acquario", "Carabinieri", "Scienziato con un dito nell’acquario sta spiegando al carabiniere la teoria del fluido mentale: “Pesci saltate!” e i pesci saltano. Prova il carabiniere con il dito nell’acqua: “Glu glu glu”."],
+  ["Maresciallo dei carabinieri ordina…", "Carabinieri", "Maresciallo dei carabinieri ordina all’appuntato di potare la siepe del giardino. Questi, potata la siepe, cerca di tagliare colla cesoia lo zampillo della fontana. Il maresciallo lo guarda dalla finestra e gli grida: “Che fai, non vedi: ACQUA NON POTABILE”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: Perché sorridono quando c’è il temporale e fuori lampeggia? Perché credono che gli facciano la fotografia!"],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Maresciallo, per fare un po’ di spazio posso bruciare le pratiche vecchie?”. “Splendida idea, appuntato, ma prima faccia una fotocopia!”."],
+  ["Perché i carabinieri vanno in", "Carabinieri", "Perché i carabinieri vanno in giro a raccogliere lampadine fulminate? Perché, avendo l’hobby della fotografia, vogliono mettere su una camera oscura."],
+  ["Un maresciallo manda l’appuntato a", "Carabinieri", "Un maresciallo manda l’appuntato a comprare un francobollo da 700 lire. Arrivato allo sportello, l’appuntato si accorge che il maresciallo non gli ha dato i soldi (!). -Vabbè - pensa - è sempre stato gentile con me.. ci penso io - . Così chiede all’impiegato: - Vorrei un francobollo da 700, ma per favore tolga il prezzo che è per un regalo!"],
+  ["Carabinieri in auto", "Carabinieri", "Carabinieri in auto: “Appuntato guarda se la freccia funziona”. “Ora sì, ora no, ora sì, ora no ...”"],
+  ["Due carabinieri passeggiano in riva", "Carabinieri", "Due carabinieri passeggiano in riva al mare. Il primo guardando in basso: “Oh guarda! Un gabbiano morto!”. Il secondo guardando in alto: “Ah, sì? dove?”"],
+  ["Perché 113 è scritto sulle", "Carabinieri", "Perché 113 è scritto sulle macchine dei carabinieri? Per indicare uno al volante, uno vicino e tre dietro, altrimenti si ammucchierebbero tutti al volante."],
+  ["Un brigadiere incaricato dal maresciallo", "Carabinieri", "Un brigadiere incaricato dal maresciallo ogni giorno di comprare il giornale, decide di comperarne sette ogni lunedì in modo da darne uno ogni giorno per tutta la settimana. Un giorno il maresciallo chiama il brigadiere e gli dice : “E poi dicono che noi carabinieri siamo stupidi! Guardi, brigadiere, questo ingegnere di Torino, sono cinque giorni che va a sbattere con la macchina contro la stessa pianta!”."],
+  ["Un maresciallo dei carabinieri chiede all’appuntato", "Carabinieri", "Un maresciallo dei carabinieri chiede all’appuntato: “Eccoti due banconote da 5000 lire e comprami le sigarette e i giornali”. Poco dopo l’appuntato ritorna: “Mi scusi, ma non mi ha detto quali sono le 5000 lire per le sigarette e quelle per i giornali!”."],
+  ["Un carabiniere", "Carabinieri", "Un carabiniere: “Mi sono comprato un gommone”. “Perché hai molto da cancellare?”"],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Perché ti gratti senza toglierti il cappello?”. “Ma perché tu quando ti gratti il sedere ti togli i pantaloni?”."],
+  ["Incidente stradale con 2 morti", "Carabinieri", "Incidente stradale con 2 morti e 4 feriti. Arti umani sparsi tra le macerie delle auto e sulla strada. Due carabinieri fanno il verbale. “Gamba destra vicino sportello posteriore sinistro Panda Rossa”. “OK, scritto”. “Braccio sinistro vicino sportello posteriore destro”. “OK, vai avanti”. “Testa di uomo barbuto accanto al guard-rail”. “Come si scrive guard... ?”. “Mmmm (dà un violento calcio alla testa) ... testa di uomo barbuto in mezzo alla strada”."],
+  ["Due carabinieri al cinema stanno", "Carabinieri", "Due carabinieri al cinema stanno guardando una scena di corse di cavalli. Il primo dice: “Punto 10.000 lire sul bianco”. Il secondo: “O.K.”. Il primo alla fine della scena: “Ho vinto io, comunque i soldi non li voglio perché il film l’ho già visto ieri”. Il secondo: “Anch’io l’ho visto l’altro ieri”. Il primo: “E allora perché hai puntato sul bianco?”. Il secondo: “Oggi mi sembrava più in forma!”."],
+  ["Come si fa a riconoscere", "Carabinieri", "Come si fa a riconoscere fra i passeggeri di un aeroporto un carabiniere? È l’unico che dà da mangiare le noccioline al Jumbo!"],
+  ["Perché un killer professionista ex", "Carabinieri", "Perché un killer professionista, ex carabiniere, è stato visto orinare in strada? Perché il capo gli ha ordinato: “falla fuori!”."],
+  ["Una stanza vuota Due porte", "Carabinieri", "Una stanza vuota. Due porte. Su una c’è scritto ENTRATA, sull’altra USCITA. Cos’è? Un labirinto per carabinieri !!"],
+  ["Come fanno i carabinieri a", "Carabinieri", "Come fanno i carabinieri a mettersi la lacca sui capelli? La spruzzano per aria e poi cercano di prenderla al volo con la testa."],
+  ["Due ubriachi escono dall’osteria e", "Carabinieri", "Due ubriachi escono dall’osteria e ognuno decide di tornare a casa propria per smaltire i fumi della sbronza. Il primo ubriaco entra in casa propria e, vedendosi riflesso nello specchio dell’ingresso, corre giù a chiamare l’amico: “Pietroooo! Pietroooo! Corri ! Ho i ladri in casa !”. Pietro lo sente e corre verso di lui: “Adesso vengo lì e gli spacchiamo la faccia !”. Corrono su per le scale aprono la porta e la richiudono subito: “Cacchio, sono in due ! Andiamo a chiedere rinforzi !”. Sono in strada e passa una macchina dei carabinieri: “Ferma ferma ! Ci sono i ladri in casa mia!”. I carabinieri si fanno portare sul posto ed uno di loro sale verso l’appartamento coi due ubriachi, dà un calcio alla porta per aprirla e poi la richiude subito esclamando: “C’era già un collega sul posto...”."],
+  ["Carabinieri rischiano di affogare nel", "Carabinieri", "Carabinieri rischiano di affogare nel lago di Garda. Gli si era spento il motoscafo ed erano scesi per spingerlo!"],
+  ["Quanti carabinieri servono per avvitare", "Carabinieri", "Quanti carabinieri servono per avvitare una lampadina? Mille e uno: uno tiene ferma la lampadina e mille vi avvitano attorno l’edificio."],
+  ["Cosa fa un carabiniere con", "Carabinieri", "Cosa fa un carabiniere con una scatola di latte sull’orecchio ? Aspetta gli ordini dalla Centrale."],
+  ["Sapete cosa c’è scritto sul", "Carabinieri", "Sapete cosa c’è scritto sul fondo delle lattine di CocaCola vendute nelle caserme dei carabinieri? Aprire dall’altro lato!"],
+  ["Istruttore dei carabinieri rivolgendosi alle reclute", "Carabinieri", "Istruttore dei carabinieri rivolgendosi alle reclute: “Su, riproviamo: Io mi lavo, tu ti lavi, egli si lava. Che tempo è?”. In coro: “È domenica!”."],
+  ["Incendio alla biblioteca della caserma dei carabinieri", "Carabinieri", "Incendio alla biblioteca della caserma dei carabinieri: salvati entrambi i libri."],
+  ["Un carabiniere e la lotteria Gratta e Vinci", "Carabinieri", "Un carabiniere e la lotteria Gratta e Vinci: Ma com’è che sono tre giorni che mi gratto e non ho vinto nulla!"],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Appuntato, accendete la luce!”. Tic tac tic tac tic tac ... “Ma che sta facendo?”. “C’è scritto 220 volt!”."],
+  ["Un uomo nero a cavallo", "Carabinieri", "Un uomo nero a cavallo, con la spada e una Z sul mantello nero arriva alla caserma dei carabinieri e consegna un malvivente. E il carabiniere di guardia: “Grazie, Zuperman!”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: cosa fa un carabiniere con le manette sopra la testa? Cerca di arrestare la caduta dei capelli."],
+  ["Perché i carabinieri hanno il", "Carabinieri", "Perché i carabinieri hanno il cappello più largo in inverno? Perché in inverno il legno tende a dilatarsi per l’umidità."],
+  ["Due carabinieri alla stazione. Il primo", "Carabinieri", "Due carabinieri alla stazione. Il primo: “Ammazza la gente!”. Il secondo tira fuori il mitra e tatatatata..."],
+  ["Carabiniere in negozio", "Carabinieri", "Carabiniere in negozio : “Vorrei un portafoglio impermeabile”. “Perché ?”. “Per metterci il denaro liquido!”."],
+  ["Un carabiniere entra in caserma", "Carabinieri", "Un carabiniere entra in caserma con una enorme merda in mano e dice ai suoi colleghi: - Ragazzi, guardate cosa stavo per calpestare!"],
+  ["Una pattuglia della polizia in", "Carabinieri", "Una pattuglia della polizia in normale servizio avvista un ragazzo che sta maneggiando della merda scaricata nottetempo da un tipo. I poliziotti scendono, si avvicinano al tipo e gli chiedono cosa stia facendo. “Sto facendo un pupazzo con la merda!”. “Un pupazzo? E che tipo di pupazzo?”. “Sto costruendo un carabiniere”. I due poliziotti si mettono a ridere e decidono di lasciarlo fare. Mentre tornano all’auto, ecco arrivare un pattuglia di carabinieri che, notato il tipo, chiedono informazioni ai poliziotti i quali, mossi a compassione per i colleghi, raccontano la storia. Allora uno dei carabinieri, incazzato come una faina, va dal giovane e gli fa: “Senti un po’, chi è che stai costruendo con quella merda?”. “Un poliziotto, voglio costruire un poliziotto!”. “Ahh, volevo ben dire ... ma aspetta un po’. Non è che mi stai pigliando per il culo? Ai poliziotti hai detto che con la merda facevi un carabiniere. È vero?”. “Beh, in effetti all’inizio volevo fare un carabiniere, ma poi la merda era pochina... “"],
+  ["Il grammo è l’unità di", "Carabinieri", "Il grammo è l’unità di misura dei pesi. Il metro è l’unità di misura delle distanze. E l’unità di misura dell’intelligenza? Il carabiniere!"],
+  ["Al corso dei carabinieri stanno", "Carabinieri", "Al corso dei carabinieri stanno spiegando il funzionamento della mitraglietta: l’istruttore spiega il funzionamento di un selettore a due posizioni: S, colpo singolo, A, automatico. Il giorno dopo prova a fare qualche domanda: “Che vuol dire se metto la levetta sulla A ?”, e la recluta titubante: “ Ehmmm, ... A RAFFICA !”."],
+  ["Un carabiniere trova uno specchio e dice", "Carabinieri", "Un carabiniere trova uno specchio e dice: “Sta faccia da delinquente la conosco; la devo arrestare”. Arriva a casa e la moglie gli trova lo specchio frugando nelle sue tasche e dice: “Caro, chi è ‘sta faccia da baldracca?”."],
+  ["Indagini nei carabinieri Caputo c’è", "Carabinieri", "Indagini nei carabinieri. “Caputo, c’è una segnalazione; dobbiamo cercare uno con un monocolo”. “Signor Maresciallo, con un monocolo è difficile... non lo posso cercare almeno con un binocolo?”."],
+  ["Fonogramma dei carabinieri mandati in", "Carabinieri", "Fonogramma dei carabinieri mandati in guerra in Pakistan: “Abbiamo problemi con i monsoni”. Il Comando: “Sterminateli!”. Risposta: “Ma sono venti!”. Il Comando: “Fossero pure 1000...!”"],
+  ["Un carabiniere avendo ereditato un", "Carabinieri", "Un carabiniere, avendo ereditato un terreno, ha bisogno di disboscarne una parte. Casualmente il giorno stesso legge una pubblicità sul giornale: NUOVISSIMA MOTOSEGA TAGLIA 60 ALBERI L’ORA. “È proprio quello che mi serve!”. Si reca quindi al negozio e si rivolge al commesso: “Senta, ho letto di quella nuova motosega che taglia 60 alberi l’ora, ma è vero?”. “Certo signore! Però costa due milioni!”. “Va bene, la compro lo stesso”. Il giorno dopo si sveglia di buon ora e si reca sul suo terreno. Taglia e taglia, ma abbatte solo 10 alberi. “Eppure mi hanno assicurato che tagliava 60 alberi l’ora, sarà l’emozione, riproverò domani”. Il giorno dopo si sveglia ancora più presto, fa una bella colazione e va sul suo terreno; taglia e taglia, ma riesce ad abbattere solo 15 alberi. “Porca troia, mi hanno fregato! Allora è proprio la motosega che è difettosa! Gliela vado subito a riportare”. Corre al negozio e dice al commesso: “Senta, a me proprio non va di essere buggerato! Questa motosega proprio non funziona! Rivoglio subito i miei soldi indietro!”. “Un attimo, signore, vediamo un po’ che tipo di difetto ha”. Allora il commesso mette la motosega sul bancone, tira la cordicella dell’accensione e VROOM, VROOOMMM. Al che il carabiniere: “Che strano! A me ‘sto rumore non me lo faceva...!”."],
+  ["Ieri mi ero appartato in", "Carabinieri", "Ieri mi ero appartato in macchina con una mia amica. Era notte e i finestrini erano appannati. Ad un certo punto bussano alla portiera, tiro giù per qualche centimetro il vetro del finestrino e vedo la faccia di un carabiniere che mi dice: “Cosa sta facendo?”. Per nulla intimorito gli dico: “Sto facendo all’amore”. E lui: “Non lo sa che è proibito? C’è una multa di 200.000 lire!”. A quel punto la mia ragazza esclama: “Però, un po’ salata come multa! “. E il carabiniere: “Ah, siete in due! Allora la multa è di 400.000 lire!”."],
+  ["Carabiniere in attesa in sala", "Carabinieri", "Carabiniere in attesa in sala parto. Nasce un negretto. L’infermiera: “È suo?”. “Può darsi, mia moglie brucia sempre tutto!”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Hai sentito, il carabiniere Carmelo Cazzone si è fatto cambiare nome”. “E come si chiama adesso?”. “Antonio”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Ma cosa fai con quell’orologio in testa?”. “Mi hanno detto che ci potevo fare la doccia, ma sono 2 ore che aspetto e non scende una goccia d’acqua!”."],
+  ["Perché i carabinieri sono in", "Carabinieri", "Perché i carabinieri sono in sciopero? Perché oltre alla paletta vogliono il secchiello!"],
+  ["Gara tra finanzieri pompieri e", "Carabinieri", "Gara tra finanzieri, pompieri e carabinieri per vedere chi pianta più pali del telefono nel terreno. Alla fine della giornata, i finanzieri hanno piantato 75 pali. I pompieri 91 e i carabinieri solo 3. Quando gli chiedono come mai della disfatta, i carabinieri esclamano in coro: “Ma loro mica li hanno piantati fino in fondo!”"],
+  ["Perché ai carabinieri non fanno", "Carabinieri", "Perché ai carabinieri non fanno mai usare la Panda 4x4 ? Senò cercano di salire in 16 !"],
+  ["Carabiniere", "Carabinieri", "Carabiniere: “Mi dia un Kg di pane”. “Comune?”. “Caltanissetta”."],
+  ["Un graduato dell’arma si rivolge", "Carabinieri", "Un graduato dell’arma si rivolge ai carabinieri adunati nel cortile della caserma: “Domenica prossima sfileremo in parata! Se alla mattina piove, sfileremo di pomeriggio, e se piove di pomeriggio sfileremo di mattina...”."],
+  ["Carabiniere fa parole crociate", "Carabinieri", "Carabiniere fa parole crociate: 2 lettere sei romano : NO."],
+  ["Carabiniere fa le parole crociate", "Carabinieri", "Carabiniere fa le parole crociate e chiede aiuto ad un collega: “4 lettere: termine volgare dell’organo genitale femminile”. “Forse lo so: orizzontale o verticale?”. “Verticale”. “No, allora non lo so”"],
+  ["Come si fa a far impazzire un carabiniere? È semplice", "Carabinieri", "Come si fa a far impazzire un carabiniere? È semplice: basta dirgli: “Ma va là, vieni qua!”."],
+  ["Carabiniere telefona al dottore", "Carabinieri", "Carabiniere telefona al dottore: “Dottore, corra subito, il maresciallo si è ingoiata la penna!”. “E voi intanto cosa state facendo?”. “Beh, usiamo la matita!”."],
+  ["Sai come fa un carabiniere", "Carabinieri", "Sai come fa un carabiniere a friggere il pesce? Mette i pesci in padella. Mette il coperchio sopra la padella. Dopo un po’ il carabiniere bussa e i pesci: “Chi è?”. “Carabinieri!”. E i pesci: “Maledizione, siamo fritti!”"],
+  ["Due carabinieri hanno esplorato la", "Carabinieri", "Due carabinieri hanno esplorato la campagna per ore e ore. Uno dei due, molto stanco, dice all’altro: “Che ne diresti di fermarci un po’ sotto un albero a fare un pic-nic?”. “Sì, ma prima vorrei mangiare un boccone!”."],
+  ["Un carabiniere trova un pinguino", "Carabinieri", "Un carabiniere trova un pinguino per la strada per cui telefona in centrale per chiedere cosa farne. “Portalo allo zoo”. Il giorno dopo ritelefona e chiede: “E oggi dove lo porto, al cinema?”."],
+  ["Il maresciallo dei carabinieri", "Carabinieri", "Il maresciallo dei carabinieri: “Appuntato, vieni dentro che fuori piove!”. L’appuntato: “Grazie, maresciallo, ma anche qui fuori!”."],
+  ["I carabinieri si lavano le", "Carabinieri", "“I carabinieri si lavano le mani prima o dopo di pisciare?”. “!?!?”. “Durante!”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Perché porti la pistola sulla testa ?”. “Perché mi hanno detto che è una Beretta!”"],
+  ["Un carabiniere sta pitturando il", "Carabinieri", "Un carabiniere sta pitturando il soffitto della caserma sporcando di vernice per terra. Entra il maresciallo: “Potevate mettere un foglio di giornale sotto la sedia”. “Grazie, ma ci arrivo lo stesso!”."],
+  ["In una caserma di carabinieri", "Carabinieri", "In una caserma di carabinieri decidono di fare una gita in pulmann. Una bella domenica mattina partono tutti insieme. Dopo poco tempo il pulmann si ferma e tutti gli agenti si chiedono come mai. Il pulmann è giunto ad un ponte troppo basso per potervi passare sotto e quella è l’unica strada per arrivare a destinazione. Il colonnello che guida la comitiva allora pone il problema a tutti i presenti, ma nessuno riesce a trovare una soluzione. Ad un certo punto uno esce e dice: “Se sgonfiamo le ruote dopo potremo passare !”. Il colonnello rimane un po’ assorto e poi ribatte: “Ma sarai imbecille! Il pulmann tocca sopra, mica sotto!” ."],
+  ["Perché i carabinieri hanno il", "Carabinieri", "Perché i carabinieri hanno il portafoglio rotondo? Per gli assegni circolari."],
+  ["Posto di blocco dei carabinieri", "Carabinieri", "Posto di blocco dei carabinieri: “Alt! Documenti”. “Digos”. E il carabiniere: “Los documentos, por favor!”."],
+  ["Due carcerati", "Carabinieri", "Due carcerati: “Tu cosa hai fatto per stare qui?”. “Un giorno torno a casa dal lavoro e trovo il mio migliore amico che si trombava mia moglie. Sei colpi di pistola ed eccomi qui. E tu cosa hai combinato?”. “Una strage... “. “No, non mi dire, eppure sembri tanto una persona perbene. E dimmi, come hai fatto?”. “Una sera torno a casa e dico a mia moglie: Cara, so una barzelletta che fa morir dal ridere. Gliel’ho raccontata e, non l’avessi mai fatto, ha riso per un’ora, un attacco cardiaco l’ha stroncata. Mi hanno subito arrestato e processato per direttissima. Il giudice allora mi fa: ‘Ce la racconti questa barzelletta che lei ci vuol far credere come causa della morte di sua moglie ed io gliel’ho raccontata. Non ti dico, sono tutti scoppiati a ridere, tranne i 2 carabinieri di servizio. Dopo alcuni minuti sono spirati dalle risa l’avvocato difensore ed il pubblico ministero e da lì via via uno ogni minuto... il giudice...la giuria... E dopo una settimana sono morti anche i due carabinieri...”"],
+  ["Sapete cosa pensa che sia", "Carabinieri", "Sapete cosa pensa che sia una colonia penale per un carabiniere? Un profumo del cazzo!"],
+  ["Un giovane carabiniere bussa alla", "Carabinieri", "Un giovane carabiniere bussa alla porta di una nota casa ove lavora una prostituta. L’avvenente signora apre e chiede per la prestazione 100.000 lire. Il giovane carabiniere risponde: “È troppo per me, ti prego fammi uno sconto!”. La signora: “OK visto che sei giovane e carino facciamo 50.000”. Il carabiniere: “Mi sono appena arruolato; è troppo” e la signora via via sconta fino ad arrivare a 10.000 allorché il giovane carabiniere dichiara che è ancora troppo e lei di rimando: “Ma quanto hai in tasca?” e il carabiniere: “Ho 5.000 lire!”. Indignata la prostituta ribatte: “Con 5.000 lire puoi andarti a fare una sega” e gli sbatte la porta in faccia. Dopo 10 minuti la signora sente nuovamente bussare ed aprendo la porta trova il carabiniere un po’ affaticato che gli porge 5.000 lire e se ne va."],
+  ["Quattro carabinieri in auto si", "Carabinieri", "Quattro carabinieri in auto si fermano davanti ad una puttana: “Quanto vuoi?”. “30.000 davanti, 50.000 di dietro”. Uno dei carabinieri di dietro: “Perché a noi di più ?”."],
+  ["Un carabiniere arriva contento in ufficio", "Carabinieri", "Un carabiniere arriva contento in ufficio: “Ieri ho finito un bel puzzle”. L’appuntato: “E quanto ci hai messo?”. “Due anni”. “Ma mi sembra molto”. “Ma che dici. Sulla scatola c’era scritto: da 3 a 6 anni!”."],
+  ["Ho conosciuto un carabiniere così", "Carabinieri", "Ho conosciuto un carabiniere così stupido, ma così stupido che, per lui, anche un foglio di carta tagliato in due era un puzzle."],
+  ["Carabiniere", "Carabinieri", "Carabiniere: “Tu te la faresti Sidney Rome ?”. “No, io preferisco la Parigi Dakkar!”."],
+  ["Notizia giornalistica", "Carabinieri", "Notizia giornalistica: Carabiniere cerca di sfregiare prostituta con un rasoio...elettrico."],
+  ["Un carabiniere deve affrontare una", "Carabinieri", "Un carabiniere deve affrontare una sparatoria con due ladri, uno di Treviso e uno di Crotone. A quale spara per primo? Al trevisano. Prima il dovere, poi il piacere!"],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Brigadiere, sua moglie ha rischiato di annegare! Ha bisogno della respirazione artificiale”. “No no, ho i soldi! Voglio la respirazione vera!”."],
+  ["Un contadino si riposa sotto", "Carabinieri", "Un contadino si riposa sotto una pianta nei pressi di una mulattiera. Passa, in retromarcia, una macchina dei carabinieri. Il contadino, incuriosito, chiede il motivo di tale manovra, e uno dei carabinieri gli risponde: “Dobbiamo andare in fondo a questa strada, e non sappiamo se avremo spazio per fare manovra”. Qualche minuto dopo la stessa macchina ripassa in direzione opposta, sempre in retromarcia. Lo stesso carabiniere, tutto soddisfatto: “C’era spazio per fare manovra!”."],
+  ["Perché i carabinieri al cinema", "Carabinieri", "Perché i carabinieri al cinema si siedono per ultimi? Perché ride bene chi ride ultimo!"],
+  ["Un carabiniere torna in caserma", "Carabinieri", "Un carabiniere torna in caserma ferito dopo aver sedato una lite in un bar. Il maresciallo: “Sei rimasto colpito nella rissa?”. “No, nelle palle!”."],
+  ["Due carabinieri sono soliti mangiare", "Carabinieri", "Due carabinieri sono soliti mangiare insieme al ristorante. Un giorno il maresciallo ne trova uno da solo e gli chiede il motivo; lui risponde : “Il mio collega è nel ristorante di fronte; il dentista, siccome aveva un dente che gli faceva male, gli ha detto di mangiare dall’altra parte”."],
+  ["Perché in Russia i carabinieri", "Carabinieri", "Perché in Russia i carabinieri vanno a tre a tre? Perché uno sa leggere, uno sa scrivere e il terzo controlla i due intellettuali."],
+  ["Carabiniere sta salendo sulla Torre", "Carabinieri", "Carabiniere sta salendo sulla Torre degli Asinelli. Ad un certo punto, stanchissimo, incontra una donna incinta in discesa: “Quanto manca?”. E la donna: “Tre mesi”. “Urca, sarà meglio che scenda!”."],
+  ["Quattro carabinieri mentre inseguivano in", "Carabinieri", "Quattro carabinieri, mentre inseguivano in un centro commerciale un rapinatore, sono rimasti bloccati per due ore sulle scale mobili a causa di interruzione dell’energia elettrica."],
+  ["Come si riconoscono due carabinieri", "Carabinieri", "Come si riconoscono due carabinieri in un negozio di scarpe ? Si misurano le scatole..."],
+  ["Due carabinieri decidono di regalare", "Carabinieri", "Due carabinieri decidono di regalare alle rispettive mogli un paio di scarpe di coccodrillo, ma visto che i prezzi risultano esorbitanti, decidono di armarsi di canoa motorizzata ed equipaggiamento da safari per procurarsi le scarpe andando direttamente alla fonte. Arrivati sul Nilo i nostri due carabinieri si dividono i compiti, il primo a prua prende al volo tutti i coccodrilli che gli capitano a tiro, il secondo li accatasta a poppa dopo averli tramortiti. Ad un certo punto, quest’ultimo si stanca e dopo aver accatastato si e no una settantina di esemplari, urla al compagno: “Aho! Ne prendiamo un altro soltanto.... se anche quello non ha le scarpe, ce ne torniamo a casa !”."],
+  ["I tre anni più duri", "Carabinieri", "I tre anni più duri del carabiniere? La prima elementare."],
+  ["Perché i carabinieri quando vanno", "Carabinieri", "Perché i carabinieri quando vanno a letto mettono sul comodino un bicchiere pieno d’acqua e uno vuoto? Perché se hanno sete bevono, se non hanno sete no!"],
+  ["Il carabiniere più sfigato Quello", "Carabinieri", "Il carabiniere più sfigato? Quello morto al posto di blocco. Il carabiniere più fortunato? Blocco. Un carabiniere siciliano entra in una pasticceria di Milano: “Vorrei una colomba”. “Motta?”. “E che viva me la vuole dare?!”."],
+  ["FONOGRAMMA", "Carabinieri", "FONOGRAMMA: “Da Ministero Interno Servizio Protezione Civile at Comando Stazione Carabinieri Roccalimbuto”: 1) Urgono notizie presunto sisma sospetto epicentro vostra zona; 2) Calcolare danni provocati da movimento tellurico et controllare scala Mercalli; 3) rispondere stesso mezzo riportando gradi esatti”. RISPOSTA: Stazione Carabinieri di Roccalimbuto: Identificato presunto Sisma. Trattasi di tale Sisma Giuseppe fu Gaetano - STOP - Per quanto riguarda epicentro non risulta nel nostro elenco anagrafico né in quello dei comuni vicini. Può trattarsi vostro errore battitura o di Bepi Centro figlio del nostro caro concittadino Pasquale Centro Maestro elementare - STOP - Il movimento tellurico non ha provocato nessun danno perché questa locale stazione tiene sotto controllo tutti i movimenti politici et sindacali - STOP - Il sig. Mercalli non ha controllato la scala - È caduto et si è rotto gamba - STOP - Per noi carabinieri i gradi sono gli stessi di prima: Io Appuntato et mio collega carabiniere semplice - STOP - Infine ci scusiamo per non aver risposto prima perché qui c’è stato un terremoto della madonna - STOP."],
+  ["Perché i carabinieri quando prendono", "Carabinieri", "Perché i carabinieri quando prendono l’aereo si vestono sportivi? Perché sull’aereo c’è scritto “No Smoking”."],
+  ["Carabinieri", "Carabinieri", "Carabinieri: “Maresciallo, posso prendere il furgone della caserma?”. “E che cosa ne deve fare?”. “Sa, ho vinto un soggiorno a Parigi e vorrei andare a ritirarlo!”."],
+  ["L’ultima invenzione dei carabinieri La", "Carabinieri", "L’ultima invenzione dei carabinieri? La torcia a batterie solari."],
+  ["Perché i carabinieri che giocano", "Carabinieri", "Perché i carabinieri che giocano in borsa sono tutti abbronzati? Perché hanno detto loro che per conoscere bene le quotazioni delle azioni devono prendere Il Sole 24 ore."],
+  ["Un capitano al carabiniere", "Carabinieri", "Un capitano al carabiniere: “Vammi a prendere il Sole 24 ore”. Ma aspetta, aspetta, il carabiniere non torna. Questi si presenta dopo .. 24 ore ... tutto bruciato dal sole!"],
+  ["L’arma dei Carabinieri decide di", "Carabinieri", "L’arma dei Carabinieri decide di effettuare una grande spedizione scientifica e convoca i giornalisti: “Andremo sul Sole!”. Un giornalista: “E come farete con il calore?”. “Andremo di notte!”."],
+  ["Tre sommozzatori si immergono a", "Carabinieri", "Tre sommozzatori si immergono a turno in un lago molto paludoso e melmoso. Sale il primo e fa : Ho visto una cosa incredibile! Un sommergibile, e mi sembra russo, mi sembra di aver visto il simbolo di falce e martello! Gli altri ma va là, è impossibile, chissa cosa era, va là, un sommergibile... e si immerge il secondo per vedere. Risale e anche questo, con aria stupefatta, dice di aver visto il sommergibile, ma gli sembra americano. Infine si immerge il terzo, e sta sotto molto più degli altri; risale, e viene subito interrogato allora? “Il sommergibile c’è, ma è dei carabinieri”. “E come fai a saperlo, c’era scritto?”. “No, ma quando ho bussato, mi hanno aperto!”."],
+  ["Perché molti carabinieri seguono il", "Carabinieri", "Perché molti carabinieri seguono il corso per sommozzatori? Perché gli hanno detto che in fondo in fondo non sono così stupidi!"],
+  ["Al bar dello spaccio della caserma dei carabinieri", "Carabinieri", "Al bar dello spaccio della caserma dei carabinieri: “Che gelati ci sono?”. chiede il commilitone. “Vaniglia e cioccolato” risponde con voce molto roca il carabiniere di turno al bar. “Che hai la laringite?”. “Macchè ... ho solo vaniglia e cioccolato!”."],
+  ["Carabinieri all’acquario", "Carabinieri", "Carabinieri all’acquario: “Che razza sono?”. “Squali”. “Squelli”."],
+  ["Perché i carabinieri indossano il", "Carabinieri", "Perché i carabinieri indossano il giubbotto antiproiettile tutte le volte che vanno al cesso? Perché i capi hanno detto loro che un giorno o l’altro uno stronzo gli sparerà!"],
+  ["Alcuni tizi al bar stanno", "Carabinieri", "Alcuni tizi al bar stanno raccontando delle barzellette sui carabinieri. Alla fine uno dei tizi chiede: “E lo sai che differenza c’è tra un carabiniere e uno stronzo?”. Uno dell’arma lì presente a questa ennesima barzelletta non ci vede più, si alza e dice: “Io sonoun carabiniere in borghese! Basta con queste barzellette!”. Afferra il tizio per la collottola e lo sbatte contro la parete: “Allora, dillo a me che differenza c’è tra un carabiniere e uno stronzo?”. Il tizio, spaventato, grida: “Nessuna, nessuna!”. E il carabiniere (più calmo): “Ah, ecco: mi pareva”."],
+  ["Cosa fa un carabiniere con", "Carabinieri", "Cosa fa un carabiniere con un dito per il culo? Cerca di arrestare lo stronzo!"],
+  ["Carabiniere accusato di stupro viene", "Carabinieri", "Carabiniere accusato di stupro viene condotto insieme ad altri davanti alla vittima. Appena questa entra grida: È lei, è lei!"],
+  ["Quanto impiega un carabiniere a", "Carabinieri", "Quanto impiega un carabiniere a suicidarsi sparandosi un colpo di rivoltella alla tempia? 3 ore: il tempo impiegato alla pallottola, rimbalzando, per arrivare al cervello!"],
+  ["Perché i carabinieri mettono la", "Carabinieri", "Perché i carabinieri mettono la sveglia per terra? Per vedere se cammina!"],
+  ["Una mattina un generale dei", "Carabinieri", "Una mattina un generale dei carabinieri trovandosi dal Presidente della Repubblica, si lamenta del fatto che l’arma dei carabinieri è la più soggetta alla derisione per via delle numerose barzellette che circolano. Il Presidente allora ribatte dicendo che in parte è vero e per provarglielo chiama il giovane carabiniere di guardia in fondo al corridoio e gli ordina: “Vai a casa a vedere se ci sono e torna qui a riferire”. Il carabiniere scatta sull’attenti e parte di corsa. Dopo un po’ dal Presidente con la lingua di fuori per la gran corsa e scattando sull’attenti dice: “No, signor presidente, lei in casa non c’è”. A questo punta il Presidente congeda il carabiniere e si rivolge al generale dicendo: “Vede, come si fa a pretendere il rispetto quando si fanno di queste figure”. Il Generale punto in pieno sull’orgoglio ribatte: “Sì, ha ragione, ma quello è ancora giovane, non ha pensato che poteva telefonare!”."],
+  ["Carabiniere telefona all’ufficio…", "Carabinieri", "Carabiniere telefona all’ufficio informazioni dell’aeroporto: “Quanto tempo impiega il volo Bologna-Roma?”. La centralinista: “Un attimo...”. E il carabiniere: “Grazie” e riattacca."],
+  ["Che differenza c’è fra un", "Carabinieri", "Che differenza c’è fra un teologo e un carabiniere? Il teologo è uno studioso di Dio, il carabiniere è un ignorante della madonna!"],
+  ["Un carabiniere osserva una vetrina", "Carabinieri", "Un carabiniere osserva una vetrina di un negozio e poi entra dentro: “Quanto vengono quelle fisarmoniche in vetrina?”. Il commesso gli risponde: “Lei è un carabiniere, vero? Noi vendiamo solo termosifoni!!”."],
+  ["Quanto tempo ci mette un", "Carabinieri", "Quanto tempo ci mette un carabiniere a scrivere BUON COMPLEANNO sulla torta? Due ore e un minuto. Un minuto per scrivere Buon Compleanno e due ore per ripulire la macchina da scrivere!"],
+  ["Un tossicodipendente entra in un", "Carabinieri", "Un tossicodipendente entra in un supermercato con una siringa infetta in mano e comincia a minacciare la gente: “Fermi tutti! Se non cacciate fuori tutti i soldi vi infetto con questa siringa usata, sono malato di AIDS!”. La gente dà soldi, orologi, collane etc al tossico. Ma ad un tratto compare un carabiniere che, sprezzante del pericolo, affronta il tossico, gli afferra la siringa e lo ammanetta e infine restituisce il maltolto ai derubati. La gente acclama il salvatore e gli chiede: “Ci dica: ma non si è reso conto che rischiava la vita? Quella siringa poteva essere infetta; poteva essere contagiato dall’AIDS!”. Il carabiniere, ridendo divertito davanti a tanta ingenuità, comincia a bucherellarsi per tutto il corpo con l’ago infetto ed esclama: “AIDS? Figuriamoci! Io tanto uso il preservativo!”."],
+  ["Giorno di paga alla caserma dei carabinieri", "Carabinieri", "Giorno di paga alla caserma dei carabinieri: “Totonno 1.000.000; Caputo 1.200.000; Lobuono 1.200.000 ... Totale 26.000.000...Totale 26.000.000 ... Ma insomma ‘sto Totale prende più di tutti e non si presenta mai!”."],
+  ["Un carabiniere torna di proposito", "Carabinieri", "Un carabiniere torna di proposito dal lavoro prima del tempo e scopre moglie e amante a letto. Deciso impugna la pistola d’ordinanza e se la punta alla tempia. A quel punto i due scoppiano a ridere, ma il carabiniere: “Ridete pure, ma dopo tocca a voi!”."],
+  ["Tre carabinieri si ritrovano a", "Carabinieri", "Tre carabinieri si ritrovano a parlare della fedeltà delle rispettive mogli. “Oh ragazzi, secondo me mia moglie se la fa con un muratore!”. “Nooo, ma non è possibile! Ma come fai a dirlo?”. “Beh sai, tutte le sere vado a casa, guardo sotto il letto, e vedo delle cazzuole, della calce, dei mattoni”. Interviene il secondo carabiniere: “Oh mah, lo sai che allora mia moglie forse va a letto con un macellaio?”. “E perché?”. “Mah, anch’io la sera guardo sotto il letto e vedo dei coltelli, degli ossi, della carne”. Allora il terzo carabiniere, sbiancato in volto guarda gli altri e fa: “Ma ragazzi, allora mia moglie va a letto con un cavallo!”. “Ma come con un cavallo, ma cosa dici!”. “No non sono proprio sicuro. Pensa che tutte le sere quando vado a casa e guardo sotto il letto trovo il fantino!”."],
+  ["Tre carabinieri devono passare un", "Carabinieri", "Tre carabinieri devono passare un esame di travestimento. Dicono al primo: “Entri in quella stanza, si travesta e aspetti”. Il carabiniere entra nella stanza, che è completamente vuota a parte un sacco per terra. Entra nel sacco e aspetta. L’esaminatore entra, dà un calcio al sacco, e il carabiniere: “Miao, miao!”. “Bravo, promosso”. Il secondo carabiniere entra nella stanza, entra nel sacco. L’esaminatore tira un altro calcio, e il carabiniere: “Miao, miao!” “Promosso!”. Il terzo entra nel sacco. L’esaminatore gli dà un calcio, ma non sente niente. Gliene dà un altro, più forte. Niente. Un altro ancora. Allora si sente il carabiniere che dice “...patate...patate...”."],
+  ["Un carabiniere và da un", "Carabinieri", "Un carabiniere và da un suo collega con 2 cappelli d’ordinanza in mano e gli rivolge un indovinello: “Dimmi Locascio, sai dirmi perché questi 2 cappelli sono 2 pesci?”. “2 pesci? Ma cosa dici? No, non lo so! Perché?”. “Perché sono i-dentici!”. Locascio si scompiscia dalle risate e poi dice: “Che bella, corro subito a raccontarla al maresciallo!”. Entra di corsa nel suo ufficio: “Maresciallo, sà dirmi perché questi 2 cappelli sono 2 pesci?”. “No, non lo so! Perché?”. “Perché sono u-guali!”."],
+  ["Carabinieri. Il maresciallo", "Carabinieri", "Carabinieri. Il maresciallo: “Ma come avete fatto a farvi scappare l’assassino? Non vi avevo detto di controllare tutte le uscite?”. L’appuntato: “Signorsì! L’abbiamo fatto, ma deve essere riuscito a filarsela passando dall’ingresso!”."],
+  ["Perché i carabinieri hanno una", "Carabinieri", "“Perché i carabinieri hanno una vasca sopra la volante?”. “Per la sirena”."],
+  ["Chi ha inventato il vassoio", "Carabinieri", "Chi ha inventato il vassoio? Un carabiniere quando gli chiesero: “Mi scusi, mi allunga quel piatto!”."],
+  ["Un ventriloquo racconta una barzelletta", "Carabinieri", "Un ventriloquo racconta una barzelletta sui carabinieri al bar quando uno dice: “Sono carabiniere e non mi piace fare la figura dell’idiota. Le darei una botta in testa”. “Mi spiace ma io...”.”Non sto dicendo a lei, ma a quello stronzo sulle sue ginocchia!”"],
+  ["Perché i carabinieri vanno in", "Carabinieri", "Perché i carabinieri vanno in giro con la pinza? Per stendere il verbale!"],
+  ["Due carabinieri vincono al totocalcio", "Carabinieri", "Due carabinieri vincono al totocalcio 1 miliardo e pensano: “Cosa dici di comprarci una caserma e metterci in proprio?”."],
+  ["Carabiniere", "Carabinieri", "Carabiniere: “Non c’è più democrazia! Mi hanno cacciato fuori dalla cabina elettorale!”. “Come mai?”. “Ero entrato con 3 colleghi: c’era scritto: piegare in 4!”."],
+  ["Da che cosa si riconosce", "Carabinieri", "Da che cosa si riconosce un carabiniere allo zoo? Dal fatto che è l’unico a cui le scimmie danno le noccioline."],
+  ["Sapete qual è l’unico animale", "Carabinieri", "Sapete qual è l’unico animale con i coglioni dentro? La pantera dei carabinieri."],
+  ["Due carabinieri sono in missione", "Carabinieri", "Due carabinieri sono in missione in un paese dell’Africa. Nel loro giorno libero vanno a caccia, vedono un leone, gli sparano e lo fanno secco al primo colpo. Scendono dalla Jeep per caricare la bestia e cominciano a tirare il leone per la criniera. Ma tira tira, il leone è troppo pesante e non riescono a spostarlo. Passa di lì un negretto che dice loro: “Guardate che se tirate il leone per la coda fate meno fatica!”. I due carabinieri applaudono subito alla bella idea e si mettono a tirare dalla coda. Solo che dopo un’ora di sforzi uno dei due dice: “Sarà una bella idea, ma mi sembra che invece di avvicinarci alla Jeep ci stiamo allontanando!”."],
+  ["Due carabinieri percorrono in auto", "Carabinieri", "Due carabinieri percorrono in auto di primo mattino la piazza del paese quando ad un tratto vedono degli asini volare intorno al campanile. Presi dal panico, SBAAMMM, distruggono la macchina. Il maresciallo ascolta il racconto e poi, scettico, va a riferire al colonnello: “Mah, degli asini intorno a un campanile... “. E il colonnello: “Ebbene, che c’è di strano? Ci sarà un nido ! “."],
+  ["I carabinieri fermano due contadini", "Carabinieri", "I carabinieri fermano due contadini che tornano dal macello: “Che trasportate?”. “Un mezzo maiale”. “Vivo o morto?”."],
+  ["Una talpa danneggia la caserma", "Carabinieri", "Una talpa danneggia la caserma dei carabinieri che decidono di ucciderla. Ma come? Si riuniscono i capi che alla fine sentenziano: “Seppellitela viva!”."],
+  ["Tre carabinieri vanno all’aeroporto Vedono", "Carabinieri", "Tre carabinieri vanno all’aeroporto. Vedono un aereo e il primo dice: “Accidenti, che aereo enorme! E chissà a che velocità arriva... secondo me fa i 200 all’ora”. Il secondo: “No, no, secondo me farà i 400 all’ora!”. Interviene il terzo: “Ma siete matti? Farà almeno 600 all’ora!”. Interviene nuovamente il primo: “Sì, sta a vedere che vola!”."],
+  ["Da che cosa si capisce", "Carabinieri", "Da che cosa si capisce che un fax è stato spedito da una bionda (o da un carabiniere) ? C’è sopra un francobollo!"],
+  ["Che cosa fa un carabiniere", "Carabinieri", "Che cosa fa un carabiniere che si rende conto che i freni della propria macchina stanno per consumarsi? Fa controllare il clacson!"],
+  ["Un carabiniere legge sul giornale", "Carabinieri", "Un carabiniere legge sul giornale: “Ogni cinque bambini nati nel mondo, uno è cinese”. E il carabiniere rivolgendosi alla moglie: “Maria, siamo fortunati: abbiamo avuto otto figli e nessuno di loro è cinese”."],
+  ["Un appuntato è follemente innamorato", "Carabinieri", "Un appuntato è follemente innamorato della figlia del maresciallo. Quest’ultimo lo sa bene e decide di fare un piacere al giovane collega; lo chiama e gli dice:” Caputo, mi ha chiamato mia figlia e mi ha chiesto di portarle urgentemente una marca da bollo da 20.000 Lire; io ho un po’ da fare; puoi andare tu per favore?”. Caputo non se lo fa ripetere due volte e, col cuore in gola, va in tabaccheria a comprare la marca. Il tabaccaio gliela dà e Caputo: “No, no; mi tolga il prezzo: è un regalo!”. VARIANTE: Caputo: “Mi dia una marca da bollo da 20.000”. Il tabaccaio gli consegna la marca da bollo e il carabiniere esclama: “Quant’è ?”"],
+  ["Un carabiniere siciliano decide un", "Carabinieri", "Un carabiniere siciliano decide un giorno di andare a farsi una bella camminata in montagna. Cammina, cammina, arriva dove inizia la prima neve. Dopo circa 10 minuti di cammino nella neve trova un cartello con su scritto “Qui inizia la neve perenne”. Il carabiniere legge ed esclama: “Minchia! E allora? Pure a Trapani inizia per N !”."],
+  ["Due carabinieri restano fermi nel", "Carabinieri", "Due carabinieri restano fermi nel cortile a guardare un elicottero che è fermo in aria sulla loro caserma. Ad un certo punto arriva il maresciallo: “Ma che cacchio fate da venti minuti li impalati con il naso in su?”. Ed i carabinieri : “Niente signor maresciallo, stavamo preoccupandoci per la presenza di quell’elicottero, è lì da mezz’ora e non va ne avanti ne indietro”. Pronto il maresciallo ribatte: “Cretini, non vedete che è finita la benzina?!”"],
+  ["Un carabiniere su un treno non la smette di gridare", "Carabinieri", "Un carabiniere su un treno non la smette di gridare: “Formidabile, eccezionale”. Ad un certo punto un passeggero chiede: “Scusi, ma si complimenta per il paesaggio o cosa?”. E il carabiniere: “Ma no, mi complimento con il macchinista: saremo entrati in una ventina di tunnel a duecento all’ora e non ha ancora beccato un pilone”."],
+  ["Notizia giornalistica", "Carabinieri", "Notizia giornalistica: Dopo una rapina i malviventi fuggono attraverso i campi. I carabinieri setacciano la campagna. I contadini ringraziano."],
+  ["Un appuntato dei carabinieri deve", "Carabinieri", "Un appuntato dei carabinieri deve fare un esame per passare al grado superiore: la sua carriera è stata impeccabile, mai un richiamo, questa carica gli spetterebbe di diritto, ma la prassi vuole così. Allora un po’ preoccupato si rivolge ad un colonnello, pregandolo di fargli una segnalazione all’ufficiale che dovrà esaminarlo, il quale gli risponde: “Vai tranquillo Caiazzo, sarà una passeggiata di salute!”. Così arriva il giorno dell’esame, si presenta con l’alta uniforme, e quando viene il suo turno viene interrogato dal generale: “Ah Caiazzo, bene una domandina facile facile, mi faccia un rombo”. “Un rombo?!?”. “Sì, che ci vuole? Un rombo!!”. Caiazzo ci pensa su e poi: “BRUM, BRUMM, BRUUMMMM!”. “Ma vada fuoriii, IGNORANTE!”. L’indomani Caiazzo va subito dal colonnello che doveva raccomandarlo, chiedendo spiegazioni, e questi: “Cretino, ma come è possibile: il generale ti chiede di fargli un rombo, e tu gliene hai fatti tre?”."],
+  ["Un carabiniere incontra un tizio", "Carabinieri", "Un carabiniere incontra un tizio per strada, gli si avvicina e gli fa : “Ciao Caputo, quanto cambiasti! Eri scuro e ora sei biondo, eri piccolo ed ora sei più alto, non avevi i baffi e ora hai pure la barba! Quanto sei cambiato!” e l’altro sconcertato : “Guardi che io non mi chiamo Caputo!” “Minchia, pure il nome cambiasti?”"],
+  ["Un carabiniere molto giovane entra", "Carabinieri", "Un carabiniere, molto giovane, entra per la prima volta in un ristorante molto chic. Consulta il menu`, poi, molto timidamente, chiama il cameriere e gli chiede: “Non ho mai mangiato il caviale e oggi voglio proprio provare... Ma ditemi: cos’e`???”. “Sono uova di storione, signore”. “Benissimo...me ne porti due alla coque!”."],
+  ["Un carabiniere indossa muta maschera", "Carabinieri", "Un carabiniere indossa muta, maschera e pinne e, preso in mano un barattolo di conserva, si immerge in mare. Dopo un po’ riemerge. Un tale lo guarda dubbioso ed il milite, anticipando la sua curiosità, dice: “Sa, sul coperchio c’è scritto dopo l’uso avvitare a fondo”!"],
+  ["Due carabinieri entrano nel set", "Carabinieri", "Due carabinieri entrano nel set di un film, si avvicinano alla protagonista e le dicono: “Ci segua senza fare storie, ci hanno detto che lei è l’eroina”."],
+  ["Degli amici si trovano al bar, uno salta su e dice", "Carabinieri", "Degli amici si trovano al bar, uno salta su e dice: “Ah, io questa settimana ho venduto addirittura 30 macchine! E tu?”. “A beh, anch’io... ho venduto un orologio a cucu a un carabiniere”. “Beh non mi sembra una gran vendita...”. “Sì, ma gli ho venduto anche 2 chili di mangime per l’uccellino”."],
+  ["Un carabiniere entra all’ufficio postale", "Carabinieri", "Un carabiniere entra all’ufficio postale con un secchio da muratore pieno di impasto bianco. Chiede un modulo ed inizia a compilarlo. Il direttore lo vede e gli chiede: “Cosa fa con quel secchio?”. “Sa, sul modulo c’è scritto firmare in calce!”."],
+  ["Un carabiniere al collega", "Carabinieri", "Un carabiniere al collega: “Era così bellina ed ora la mia auto ha un’ammaccatura che fa paura!”. “Dai non ti disperare ho io la soluzione al tuo problema. Le auto moderne hanno la carrozzeria così sottile che basta soffiare nella marmitta per rimetterla in forma”. “Davvero... vado a provare subito!”. Così dicendo si precipita verso la sua auto e portatosi con la bocca sulla marmitta inizia a soffiare energicamente. Passa il maresciallo e molto stupito chiede: “Di grazia cosa sta facendo?”. “Soffio nella marmitta per rimettere in forma l’auto che ha un’ammaccatura!”. “Santiddio ma come si fa a essere così stupidi!! Chiuda i finestrini no?!?”."],
+  ["Rutelli si accorge che per", "Carabinieri", "Rutelli si accorge che per il Giubileo è tutto pronto tranne una via in cui manca l’illuminazione. Allora decide di affidare il compito di piantare i pali a tre gruppi: uno di finanzieri, uno di poliziotti ed uno di carabinieri. Alla fine del primo giorno i finanzieri fanno rapporto: “Abbiamo piantato 28 pali” e Rutelli: “Bravi, ottimo lavoro”.Il giorno dopo i poliziotti: “Abbiamo piantato 36 pali” e Rutelli “Ottimo, con domani avremo sicuramente finito”. Il terzo giorno arriva il maresciallo dei carabinieri: “Abbiamo piantato 2 pali” .Rutelli incazzato gli chiede: “Ma come i finanzieri 28, i poliziotti 36 e voi solo 2?”. E il maresciallo: “Sì, ma gli altri li avevano lasciati fuori di 4 metri”."],
+  ["Carabiniere alle prese con un cruciverba", "Carabinieri", "Carabiniere alle prese con un cruciverba: “4 Verticale: Siede alla destra del padre”. “Gesù, e chi sarà?”"],
+  ["Perché i carabinieri sono degli", "Carabinieri", "Perché i carabinieri sono degli enfant prodige? Perché a due anni sono già furbi come a cinquanta."],
+  ["Perché le mamme dei carabinieri", "Carabinieri", "Perché le mamme dei carabinieri hanno tutte le tette grosse e gonfie? Perché i carabinieri da piccoli invece che succhiare il latte ci soffiano dentro."],
+  ["Perché i carabinieri bevono vino", "Carabinieri", "Perché i carabinieri bevono vino al metanolo? Perché hanno saputo che fa aumentare di grado."],
+  ["Qual è l’invenzione brevettata dal", "Carabinieri", "Qual è l’invenzione brevettata dal nucleo scientifico dei carabinieri? I sedili di eiezione per elicottero."],
+  ["Un carabiniere paracadutista sta facendo", "Carabinieri", "Un carabiniere paracadutista sta facendo esercitazioni di lancio assieme ad altri colleghi di diverse armi. Si butta, apre il paracadute e mentre plana lentamente verso terra viene passato in velocità da un finanziere urlante col paracadute chiuso, passa qualche secondo e passa un finanziere col paracadute chiuso, seguito da un poliziotto nelle stesse condizioni. A quel punto il nostro bravo carabiniere dice: “E per Dio! E ditelo prima che è una gara!!!” slacciandosi l’imbragatura..."],
+  ["Un gregge di pecore sta", "Carabinieri", "Un gregge di pecore sta pascolando su di una collinetta. Un carabiniere in borghese si avvicina al pastore seduto su di una pietra e dice: “Scommettiamo che indovino quante pecore hai?”. “Se indovini, te ne regalo una!”. “183”. “Bravo, scegliti quella che vuoi”. “Ora scommettiamo che io indovino che mestiere fai tu?” replica il pastore. “Il carabiniere!”. “E come hai fatto?”. “Solo un carabiniere poteva scegliersi un cane!”."],
+  ["Un carabiniere entra in caserma", "Carabinieri", "Un carabiniere entra in caserma e trova il suo maresciallo molto afflitto: “Maresciallo, ma che è successo? È disperato!”. “Ha ragione appuntato, ma stanotte è morto mio padre, era vecchio....”. Poco dopo l’appuntato rientra nella stanza del maresciallo e lo trova che sta piangendo disperatamente: “Maresciallo, d’accordo, è una disgrazia, ma fatevi coraggio...”. “No, appuntato, non avete capito, le disgrazie sono due... ha telefonato mio fratello e mi ha detto che è morto anche suo padre....”"],
+  ["C’è un carabiniere fuori servizio", "Carabinieri", "C’è un carabiniere fuori servizio che sta passando un sabato sera in discoteca. Abborda una bella biondona: “Senti cara... perché non andiamo a casa tua a bere qualcosa ...”. La biondona che ha capito le intenzioni del carabiniere fa: “No guarda ... proprio non posso ... ho il ciclo!”. “Non ti preoccupare... tu vai avanti col ciclo e io ti seguo con la macchina!”."],
+  ["Un carabiniere dopo un incidente", "Carabinieri", "Un carabiniere dopo un incidente d’auto riporta la frattura multipla di entrambe le mani. Preoccupato per le conseguenze chiede al medico dell’ospedale: “Dottore, dopo che mi avrà operato potrò suonare il violino?”. Il medico risponde: “È molto probabile, la chirurgia moderna al giorno d’oggi fa miracoli!”. E il carabiniere: “Fantastico!! !Incredibile!!! Pensi che non ho mai suonato il violino finora!!”."],
+  ["Un appuntato romano deve sostenere", "Carabinieri", "Un appuntato (romano) deve sostenere un esame, ed è terrorizzato dalle domande di grammatica: “Cosa chiedono di solito ?” chiede a un collega. “Vai tranquillo, chiedono sempre il gerundio del verbo avere...”. “EEeeh ???”. “Non ti preoccupare, rispondi AVENDO !!”. Arriva il giorno dell’esame e la commissione chiede: “Bene, ed ora una domanda di grammatica: qual è il gerundio del verbo avere ?”. “AVENDO”. “Bene! Ci sa dire una frase con AVENDO”. Dopo essere diventato paonazzo e dopo molti minuti di concentrazione esclama: “Io ho una Lancia Thema 2000 i.e. ... domani AVENDO !”. “Non capisco, può ripetere ?”. “Io ho una Lancia Thema 2000 i.e. ... domani A-VENDO !”."],
+  ["Un carabiniere dal medico", "Carabinieri", "Un carabiniere dal medico: “Dottore sono preoccupato, ho paura dell’AIDS, mi dia un rimedio”. “Mi dispiace - risponde il dottore - all’AIDS non c’è rimedio, l’unica cosa è di usare sempre il preservativo”. Due mesi dopo un collega sotto la doccia: “Cosa hai li?”. “Il preservativo!”. “Come mai lo porti anche sotto la doccia?”. “Il dottore mi ha detto che è l’unico rimedio contro l’AIDS...”. “Ma non lo levi mai?”. “Sì, solo per pisciare e trombare!”."],
+  ["Due carabinieri si incontrano al bar. Il primo", "Carabinieri", "Due carabinieri si incontrano al bar. Il primo: “Sai, io e il mio comandante abbiamo sequestrato un camion di sigarette di contrabbando”. E l’altro: “Beh, questo è niente. Pensa che io e il mio comandante abbiamo sequestrato Soffiantini!”\\"],
+  ].map((j, i) => ({id:i+1, title:j[0], category:j[1], text:j[2]}));
+
+  const $ = (id) => document.getElementById(id);
+  const today = new Date();
+  const dateLabel = new Intl.DateTimeFormat("it-IT", {weekday:"long", day:"numeric", month:"long", year:"numeric"}).format(today);
+  $("today-date").textContent = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
+  $("year").textContent = today.getFullYear();
+
+  // Calcolo stabile: stesso fatto per tutto il giorno, nuovo fatto nei giorni successivi.
+  function dayIndex(date) {
+    const start = new Date(date.getFullYear(), 0, 0);
+    return Math.floor((date - start) / 86400000);
+  }
+  let dailyFact = facts[(dayIndex(today) - 1) % facts.length];
+  function showFact(fact) {
+    dailyFact = fact;
+    $("daily-title").textContent = fact.title;
+    $("daily-text").textContent = fact.text;
+    $("daily-source").textContent = "Fonte tematica: " + fact.source + " · Archivio locale";
+  }
+  showFact(dailyFact);
+  $("copy-fact").addEventListener("click", async () => {
+    const text = dailyFact.title + "\n" + dailyFact.text;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("Curiosità copiata negli appunti.");
+    } catch {
+      toast("Il browser non consente la copia automatica: seleziona il testo e copialo.");
+    }
+  });
+
+  const categories = ["Tutte", ...new Set(jokes.map(j => j.category))];
+  let activeCategory = "Tutte", visibleLimit = 12, visibleJokes = [];
+  const cats = $("categories");
+  categories.forEach(cat => {
+    const button = document.createElement("button");
+    button.className = "cat" + (cat === activeCategory ? " active" : "");
+    button.textContent = cat;
+    button.type = "button";
+    button.addEventListener("click", () => {
+      activeCategory = cat;
+      visibleLimit = 12;
+      [...cats.children].forEach(b => b.classList.toggle("active", b.textContent === cat));
+      renderJokes();
+    });
+    cats.appendChild(button);
+  });
+
+  function getFilteredJokes() {
+    const q = $("search").value.trim().toLocaleLowerCase("it");
+    let result = jokes.filter(j =>
+      (activeCategory === "Tutte" || j.category === activeCategory) &&
+      (!q || (j.title + " " + j.category + " " + j.text).toLocaleLowerCase("it").includes(q))
+    );
+    const sort = $("sort").value;
+    if (sort === "az") result.sort((a,b) => a.title.localeCompare(b.title, "it"));
+    if (sort === "random") result = result.slice().sort(() => Math.random() - .5);
+    return result;
+  }
+  function renderJokes() {
+    const all = getFilteredJokes();
+    visibleJokes = all.slice(0, visibleLimit);
+    const list = $("jokes-list");
+    list.replaceChildren();
+    visibleJokes.forEach(j => {
+      const card = document.createElement("article");
+      card.className = "joke";
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", "Apri barzelletta: " + j.title);
+      card.addEventListener("click", () => openJokeModal(j));
+      card.addEventListener("keydown", e => {
+        if (e.target !== card) return;
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openJokeModal(j); }
+      });
+      const top = document.createElement("div"); top.className = "joke-top";
+      const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = j.category;
+      const num = document.createElement("span"); num.className = "joke-num"; num.textContent = "#" + String(j.id).padStart(3,"0");
+      top.append(tag,num);
+      const title = document.createElement("h3"); title.textContent = j.title;
+      const text = document.createElement("p"); text.textContent = j.text;
+      const foot = document.createElement("div"); foot.className = "joke-footer";
+      const label = document.createElement("span"); label.className = "source"; label.textContent = "Clicca per leggere";
+      const copy = document.createElement("button"); copy.className = "tiny-btn"; copy.textContent = "Copia ↗"; copy.type = "button";
+      copy.addEventListener("click", async e => {
+        e.stopPropagation();
+        try { await navigator.clipboard.writeText(j.title + "\n" + j.text); toast("Barzelletta copiata."); }
+        catch { toast("Copia non disponibile in questo browser."); }
+      });
+      foot.append(label,copy);
+      card.append(top,title,text,foot);
+      list.appendChild(card);
+    });
+    $("joke-count").textContent = all.length + (all.length === 1 ? " risultato" : " risultati") + " · " + jokes.length + " nell'archivio";
+    $("empty").style.display = all.length ? "none" : "block";
+    $("load-more").style.display = visibleLimit >= all.length ? "none" : "inline-block";
+  }
+  $("search").addEventListener("input", () => { visibleLimit = 12; renderJokes(); });
+  $("sort").addEventListener("change", () => { visibleLimit = 12; renderJokes(); });
+  $("load-more").addEventListener("click", () => { visibleLimit += 12; renderJokes(); });
+  renderJokes();
+
+  const jokeModal = $("joke-modal");
+  let activeJoke = null;
+  function openJokeModal(j) {
+    activeJoke = j;
+    $("joke-modal-category").textContent = j.category;
+    $("joke-modal-number").textContent = "#" + String(j.id).padStart(3,"0");
+    $("joke-modal-title").textContent = j.title;
+    $("joke-modal-text").textContent = j.text;
+    jokeModal.classList.add("open");
+    $("joke-modal-close").focus();
+  }
+  function closeJokeModal() { jokeModal.classList.remove("open"); activeJoke = null; }
+  $("joke-modal-close").addEventListener("click", closeJokeModal);
+  jokeModal.addEventListener("click", e => { if (e.target === jokeModal) closeJokeModal(); });
+  $("joke-modal-copy").addEventListener("click", async () => {
+    if (!activeJoke) return;
+    try { await navigator.clipboard.writeText(activeJoke.title + "\n" + activeJoke.text); toast("Barzelletta copiata."); }
+    catch { toast("Copia non disponibile in questo browser."); }
+  });
+
+  let toastTimer;
+  function toast(message) {
+    const el = $("toast"); el.textContent = message; el.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+  const modal = $("modal");
+  function openModal(title, text) {
+    $("modal-title").textContent = title; $("modal-text").textContent = text;
+    modal.classList.add("open"); $("close-modal").focus();
+  }
+  function closeModal() { modal.classList.remove("open"); }
+  $("close-modal").addEventListener("click", closeModal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") { closeModal(); closeJokeModal(); } });
+  $("status-secret").addEventListener("click", () => openModal("Errore 418: sono una teiera", "Il reparto tecnico è stato sostituito da una teiera senziente. Ha chiesto ferie, contributi e una connessione stabile."));
+  $("about-link").addEventListener("click", e => {
+    e.preventDefault();
+    openModal("Note legali immaginarie", "Tutti i fatti sono stati scritti per essere informativi, ma controlla le fonti se devi citarli. Le barzellette possono causare silenzi imbarazzanti. Il sito non raccoglie dati, non usa cookie di profilazione e funziona interamente nel browser.");
+  });
+  $("surprise-link").addEventListener("click", e => {
+    e.preventDefault();
+    openModal("Hai premuto il pulsante.", "Complimenti: hai appena completato una side quest senza ricompensa. +1 esperienza, -3 minuti di vita. Codice segreto: KAFKA404.");
+  });
+  // Easter egg da tastiera: digita BOH.
+  let typed = "";
+  document.addEventListener("keydown", e => {
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      typed = (typed + e.key.toLowerCase()).slice(-3);
+      if (typed === "boh") {
+        openModal("BOH MODE ATTIVATA", "Hai sbloccato il livello di conoscenza più alto: sapere che non sai perché sei qui. Titolo ottenuto: Impiegato dell'Assurdo.");
+        typed = "";
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
